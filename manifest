@@ -1,0 +1,23 @@
+{
+  "name": "WattWise - Electricity Tracker",
+  "short_name": "WattWise",
+  "description": "Understand where your electricity goes.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f8f5",
+  "theme_color": "#79d862",
+  "orientation": "portrait",
+
+  "icons": [
+    {
+      "src": "https://drive.google.com/uc?id=YOUR_ICON_ID",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://drive.google.com/uc?id=YOUR_ICON_ID",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
