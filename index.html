@@ -1934,6 +1934,44 @@
 </div>
 
 
+  <script>
+
+if ("serviceWorker" in navigator) {
+
+  window.addEventListener(
+    "load",
+    function() {
+
+      navigator.serviceWorker.register(
+        "./service-worker.js"
+      )
+      .then(
+        function() {
+
+          console.log(
+            "WattWise Service Worker Registered"
+          );
+
+        }
+      )
+      .catch(
+        function(error) {
+
+          console.error(
+            "Service Worker Error:",
+            error
+          );
+
+        }
+      );
+
+    }
+  );
+
+}
+
+</script>
+
 </body>
 
 </html>
