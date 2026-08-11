@@ -1,4 +1,4 @@
-<script>
+
 
 /* =====================================================
    GLOBAL STATE
@@ -4799,6 +4799,3 @@ function continueLoadingApp(){
 
 
 
-
-
-</script>
