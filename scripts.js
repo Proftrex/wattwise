@@ -207,7 +207,7 @@ if (monthSelector) {
 }
 
 
-
+console.log("WattWise scripts.js loaded");
 /* =====================================================
    HOUSEHOLD SETUP
    ===================================================== */
