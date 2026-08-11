@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <base target="_top">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+        <meta name="theme-color" content="#79d862">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  <title>
+    WattWise
+  </title>
+
+  <?!= include('styles'); ?>
+
+</head>
+
+
+<body>
+
+  <!-- ==================================================
+       APP HEADER
+       ================================================== -->
+
+  <header class="app-header">
+
+    <div id="appHeader" class="header-inner">
+
+      <div>
+
+        <div class="app-title">
+          ⚡ WattWise
+        </div>
+
+        <div class="app-subtitle">
+          Understand where your electricity goes.
+        </div>
+
+      </div>
+
+      <button
+        class="header-button"
+        onclick="refreshDashboard()">
+
+        ↻ Refresh
+
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- ==================================================
+       MAIN APPLICATION
+       ================================================== -->
+
+  <main class="app-container">
+
+
+    <!-- =================================================
+         HOUSEHOLD SETUP
+         ================================================= -->
+
+    <section
+      id="setupSection"
+      class="setup-card">
+
+      <div class="setup-icon">
+        🏠
+      </div>
+
+      <h2>
+        Welcome to WattWise!
+      </h2>
+
+      <p>
+      Track your watts before your wallet gets shocked.
+      </p>
+
+      <div class="form-group">
+
+        <label>
+          Your email
+        </label>
+
+        <input
+          id="userEmail"
+          type="email"
+          placeholder="example@email.com">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Household name
+        </label>
+
+        <input
+          id="householdName"
+          type="text"
+          placeholder="e.g. Our Family Home">
+
+      </div>
+
+
+      <button
+        class="primary-button full-width"
+        onclick="startTracker()">
+
+        Start Tracking
+
+      </button>
+
+    </section>
+
+
+    <!-- =================================================
+         DASHBOARD
+         ================================================= -->
+
+    <section
+      id="dashboardSection"
+      class="hidden">
+
+
+      <!-- ===============================================
+           DASHBOARD TOP
+           =============================================== -->
+
+      <div class="dashboard-top">
+
+        <div>
+
+          <h1>
+            Your WattWise Dashboard
+          </h1>
+
+          <p id="householdGreeting">
+            Your household
+          </p>
+
+        </div>
+
+
+        <div class="month-selector">
+
+  <label for="selectedMonth">
+    Month
+  </label>
+
+  <select
+  id="selectedMonth"
+  onchange="refreshDashboard()">
+</select>
+
+</div>
+
+      </div>
+
+
+      <!-- ===============================================
+           SUMMARY CARDS
+           =============================================== -->
+
+      <div class="summary-grid">
+
+
+        <div class="summary-card">
+
+          <div class="summary-icon">
+            💰
+          </div>
+
+          <div class="summary-label">
+            Estimated Monthly Bill
+          </div>
+
+          <div
+            id="totalCost"
+            class="summary-value">
+
+            ₱0.00
+
+          </div>
+
+          <div
+            id="costChange"
+            class="summary-change">
+
+            —
+
+          </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+          <div class="summary-icon">
+            ⚡
+          </div>
+
+          <div class="summary-label">
+            Estimated Consumption
+          </div>
+
+          <div
+            id="totalKwh"
+            class="summary-value">
+
+            0 kWh
+
+          </div>
+
+          <div
+            id="kwhChange"
+            class="summary-change">
+
+            —
+
+          </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+          <div class="summary-icon">
+            🔌
+          </div>
+
+          <div class="summary-label">
+            Electricity Rate
+          </div>
+
+          <div
+            id="electricityRate"
+            class="summary-value">
+
+            ₱0.00
+
+          </div>
+
+          <div class="summary-small">
+            per kWh
+          </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+          <div class="summary-icon">
+            🏆
+          </div>
+
+          <div class="summary-label">
+            Highest Consumer
+          </div>
+
+          <div
+            id="highestConsumer"
+            class="summary-value summary-text">
+
+            —
+
+          </div>
+
+          <div
+            id="highestConsumerCost"
+            class="summary-small">
+
+            —
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===============================================
+           ALERT
+           =============================================== -->
+
+      <div
+        id="alertContainer"
+        class="alert-container hidden">
+      </div>
+
+
+  <!-- ===============================================
+     QUICK ACTIONS
+     =============================================== -->
+
+<div class="quick-actions">
+
+  <button
+    class="primary-button"
+    onclick="openAddApplianceModal()">
+
+    + Add Appliance
+
+  </button>
+
+
+  <button
+    class="secondary-button"
+    onclick="openRateModal()">
+
+    ₱ Electricity Rate
+
+  </button>
+
+
+  <button
+    class="secondary-button"
+    onclick="openActualBillModal()">
+
+    🧾 Enter Actual Bill
+
+  </button>
+
+
+  <button
+    class="secondary-button"
+    onclick="viewBill()">
+
+    📄 View  Bill Histories
+
+  </button>
+
+
+</div>
+
+
+      <!-- ===============================================
+           ACTUAL VS ESTIMATED
+           =============================================== -->
+
+      <div
+        id="actualBillCard"
+        class="comparison-card">
+
+        <div>
+
+          <div class="comparison-title">
+            Estimated vs Actual Bill
+          </div>
+
+          <div
+            id="actualBillMessage"
+            class="comparison-message">
+
+            Enter your actual electricity bill
+            to compare it with the estimate.
+
+          </div>
+
+        </div>
+
+        <div
+          id="actualBillAmount"
+          class="comparison-value">
+
+          —
+
+        </div>
+
+      </div>
+
+
+      <!-- ===============================================
+           MAIN DASHBOARD GRID
+           =============================================== -->
+
+      <div class="dashboard-grid">
+
+
+        <!-- =============================================
+             APPLIANCE RANKING
+             ============================================= -->
+
+        <div class="dashboard-card">
+
+          <div class="card-header">
+
+            <div>
+
+              <h2>
+                🔥 Biggest Electricity Consumers
+              </h2>
+
+              <p>
+                Which appliances cost you the most?
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="applianceRanking"
+            class="ranking-list">
+
+            <div class="loading">
+              Loading...
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =============================================
+             CATEGORY BREAKDOWN
+             ============================================= -->
+
+        <div class="dashboard-card">
+
+          <div class="card-header">
+
+            <div>
+
+              <h2>
+                📊 By Category
+              </h2>
+
+              <p>
+                Where your electricity is going.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="categoryBreakdown"
+            class="category-list">
+
+            <div class="loading">
+              Loading...
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===============================================
+           APPLIANCE TABLE
+           =============================================== -->
+
+      <div class="dashboard-card full-card">
+
+        <div class="card-header">
+
+          <div>
+
+            <h2>
+              🔌 My Appliances
+            </h2>
+
+            <p>
+              Manage the appliances in your home.
+            </p>
+
+          </div>
+
+
+          <button
+            class="primary-button small-button"
+            onclick="openAddApplianceModal()">
+
+            + Add Appliance
+
+          </button>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Appliance
+                </th>
+
+                <th>
+                  Category
+                </th>
+
+                <th>
+                  Power
+                </th>
+
+                <th>
+                  Usage
+                </th>
+
+                <th>
+                  Monthly kWh
+                </th>
+
+                <th>
+                  Est. Cost
+                </th>
+
+                <th>
+                  %
+                </th>
+
+                <th>
+                  Actions
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody
+              id="applianceTableBody">
+
+              <tr>
+
+                <td
+                  colspan="8"
+                  class="empty-state">
+
+                  No appliances added yet.
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===============================================
+           TIPS
+           =============================================== -->
+
+      <div class="tips-card">
+
+        <div class="tips-icon">
+          💡
+        </div>
+
+        <div>
+
+          <h3>
+            Electricity-saving tip
+          </h3>
+
+          <p id="energyTip">
+
+            Add your appliances to see which ones
+            are using the most electricity.
+
+          </p>
+
+        </div>
+
+      </div>
+
+
+    </section>
+
+
+  </main>
+
+
+  <!-- ==================================================
+       ADD / EDIT APPLIANCE MODAL
+       ================================================== -->
+
+  <div
+    id="applianceModal"
+    class="modal hidden">
+
+    <div class="modal-overlay"
+         onclick="closeApplianceModal()">
+    </div>
+
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+
+        <div>
+
+          <h2 id="applianceModalTitle">
+            Add Appliance
+          </h2>
+
+          <p>
+            Enter the information from the appliance label
+            or your best estimate.
+          </p>
+
+        </div>
+
+
+        <button
+          class="close-button"
+          onclick="closeApplianceModal()">
+
+          ×
+
+        </button>
+
+      </div>
+
+
+      <form
+        id="applianceForm"
+        onsubmit="saveAppliance(event)">
+
+
+        <input
+          id="applianceId"
+          type="hidden">
+
+
+        <div class="form-grid">
+
+
+          <div class="form-group">
+
+            <label>
+              Appliance Name *
+            </label>
+
+            <input
+              id="applianceName"
+              type="text"
+              placeholder="e.g. Aircon"
+              required>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Category *
+            </label>
+
+            <select
+              id="applianceCategory"
+              required>
+
+              <option value="">
+                Select category
+              </option>
+
+              <option value="Heavy Appliances">
+                Heavy Appliances
+              </option>
+
+              <option value="Kitchen Appliances">
+                Kitchen Appliances
+              </option>
+
+              <option value="Electronics/Gadgets">
+                Electronics / Gadgets
+              </option>
+
+              <option value="Lighting">
+                Lighting
+              </option>
+
+              <option value="Other Appliances">
+                Other Appliances
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Brand / Model
+            </label>
+
+            <input
+              id="brandModel"
+              type="text"
+              placeholder="Optional">
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Wattage (W) *
+            </label>
+
+            <input
+              id="wattage"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="e.g. 1000"
+              required>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Quantity *
+            </label>
+
+            <input
+              id="quantity"
+              type="number"
+              min="1"
+              step="1"
+              value="1"
+              required>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Usage Type *
+            </label>
+
+            <select
+              id="usageType"
+              onchange="updateUsageFields()"
+              required>
+
+              <option value="Hours per day">
+                Hours per day
+              </option>
+
+              <option value="Continuous (24/7)">
+                Continuous (24/7)
+              </option>
+
+              <option value="Uses per day">
+                Uses per day
+              </option>
+
+              <option value="Uses per week">
+                Uses per week
+              </option>
+
+              <option value="Uses per month">
+                Uses per month
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div
+            id="hoursPerDayGroup"
+            class="form-group">
+
+            <label>
+              Hours per Use / Day
+            </label>
+
+            <input
+              id="hoursPerDay"
+              type="number"
+              min="0"
+              max="24"
+              step="0.1"
+              value="1">
+
+          </div>
+
+
+          <div
+            id="usesPerDayGroup"
+            class="form-group hidden">
+
+            <label>
+              Uses per Day
+            </label>
+
+            <input
+              id="usesPerDay"
+              type="number"
+              min="0"
+              step="1"
+              value="1">
+
+          </div>
+
+
+          <div
+            id="usesPerWeekGroup"
+            class="form-group hidden">
+
+            <label>
+              Uses per Week
+            </label>
+
+            <input
+              id="usesPerWeek"
+              type="number"
+              min="0"
+              step="1"
+              value="1">
+
+          </div>
+
+
+          <div
+            id="usesPerMonthGroup"
+            class="form-group hidden">
+
+            <label>
+              Uses per Month
+            </label>
+
+            <input
+              id="usesPerMonth"
+              type="number"
+              min="0"
+              step="1"
+              value="1">
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Days Used per Month
+            </label>
+
+            <input
+              id="daysPerMonth"
+              type="number"
+              min="1"
+              max="31"
+              value="30">
+
+          </div>
+
+
+          <!-- AIRCON FIELDS -->
+
+          <div
+            id="airconFields"
+            class="special-fields hidden">
+
+            <div class="special-title">
+              ❄️ Aircon Details
+            </div>
+
+
+            <div class="form-group">
+
+              <label>
+                Aircon HP
+              </label>
+
+              <select id="airconHp">
+
+                <option value="">
+                  Select HP
+                </option>
+
+                <option value="0.5">
+                  0.5 HP
+                </option>
+
+                <option value="0.75">
+                  0.75 HP
+                </option>
+
+                <option value="1">
+                  1.0 HP
+                </option>
+
+                <option value="1.5">
+                  1.5 HP
+                </option>
+
+                <option value="2">
+                  2.0 HP
+                </option>
+
+                <option value="2.5">
+                  2.5 HP
+                </option>
+
+                <option value="3">
+                  3.0 HP
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>
+                Aircon Type
+              </label>
+
+              <select id="airconType">
+
+                <option value="">
+                  Select type
+                </option>
+
+                <option value="Inverter">
+                  Inverter
+                </option>
+
+                <option value="Non-inverter">
+                  Non-inverter
+                </option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <!-- RICE COOKER -->
+
+          <div
+            id="riceCookerFields"
+            class="special-fields hidden">
+
+            <div class="special-title">
+              🍚 Rice Cooker Details
+            </div>
+
+
+            <div class="form-group">
+
+              <label>
+                Cooking Hours / Day
+              </label>
+
+              <input
+                id="cookingHours"
+                type="number"
+                min="0"
+                max="24"
+                step="0.1"
+                value="1">
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>
+                Warm Mode Hours / Day
+              </label>
+
+              <input
+                id="warmModeHours"
+                type="number"
+                min="0"
+                max="24"
+                step="0.1"
+                value="0">
+
+            </div>
+
+          </div>
+
+
+          <!-- CUSTOM DAILY CONSUMPTION -->
+
+          <div class="form-group full-span">
+
+            <label>
+              Estimated kWh / Day
+              <span class="optional">
+                Optional
+              </span>
+            </label>
+
+            <input
+              id="estimatedKwhPerDay"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Leave blank if unknown">
+
+            <div class="field-help">
+
+              If you know the appliance's actual
+              daily electricity consumption, you can
+              enter it here.
+
+            </div>
+
+          </div>
+
+
+        </div>
+
+
+        <div
+          id="applianceFormMessage"
+          class="form-message">
+        </div>
+
+
+        <div class="modal-actions">
+
+          <button
+            type="button"
+            class="secondary-button"
+            onclick="closeApplianceModal()">
+
+            Cancel
+
+          </button>
+
+
+          <button
+            type="submit"
+            class="primary-button">
+
+            Save Appliance
+
+          </button>
+
+        </div>
+
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==================================================
+       ELECTRICITY RATE MODAL
+       ================================================== -->
+
+  <div
+    id="rateModal"
+    class="modal hidden">
+
+    <div
+      class="modal-overlay"
+      onclick="closeRateModal()">
+    </div>
+
+
+    <div class="modal-content small-modal">
+
+      <div class="modal-header">
+
+        <div>
+
+          <h2>
+            ₱ Electricity Rate
+          </h2>
+
+          <p>
+            Enter the electricity rate from your bill.
+          </p>
+
+        </div>
+
+
+        <button
+          class="close-button"
+          onclick="closeRateModal()">
+
+          ×
+
+        </button>
+
+      </div>
+
+
+      <form
+        onsubmit="saveRate(event)">
+
+
+        <div class="form-group">
+
+          <label>
+            Month
+          </label>
+
+          <input
+            id="rateMonth"
+            type="month"
+            required>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Electricity Rate (₱/kWh)
+          </label>
+
+          <input
+            id="ratePerKwh"
+            type="number"
+            min="0"
+            step="0.0001"
+            placeholder="e.g. 11.50"
+            required>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Provider
+          </label>
+
+          <input
+            id="rateProvider"
+            type="text"
+            placeholder="e.g. Meralco">
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Notes
+          </label>
+
+          <textarea
+            id="rateNotes"
+            rows="3"
+            placeholder="Optional">
+          </textarea>
+
+        </div>
+
+
+        <div
+          id="rateFormMessage"
+          class="form-message">
+        </div>
+
+
+        <div class="modal-actions">
+
+          <button
+            type="button"
+            class="secondary-button"
+            onclick="closeRateModal()">
+
+            Cancel
+
+          </button>
+
+
+          <button
+            type="submit"
+            class="primary-button">
+
+            Save Rate
+
+          </button>
+
+        </div>
+
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==================================================
+       ACTUAL BILL MODAL
+       ================================================== -->
+
+  <div
+  id="actualBillModal"
+  class="modal hidden">
+
+
+  <div
+    class="modal-overlay"
+    onclick="closeActualBillModal()">
+  </div>
+
+
+
+  <div class="modal-content small-modal">
+
+
+    <div class="modal-header">
+
+      <div>
+
+        <h2>
+          🧾 Actual Electricity Bill
+        </h2>
+
+        <p>
+          Enter the details shown on your electricity bill.
+        </p>
+
+      </div>
+
+
+      <button
+        class="close-button"
+        onclick="closeActualBillModal()">
+
+        ×
+
+      </button>
+
+    </div>
+
+
+
+
+    <form
+      onsubmit="saveActualBill(event)">
+
+
+
+      <div class="form-group">
+
+        <label>
+          Month
+        </label>
+
+        <input
+          id="billMonth"
+          type="month"
+          required>
+
+      </div>
+
+
+
+
+      <div class="form-group">
+
+        <label>
+          Actual kWh
+          <span class="optional">
+            Optional
+          </span>
+        </label>
+
+        <input
+          id="actualKwh"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="Found on your bill">
+
+      </div>
+
+
+
+
+      <h3>
+        Electricity Charges
+      </h3>
+
+
+
+
+      <div class="form-group">
+        <label>
+          Generation
+        </label>
+
+        <input
+          id="generation"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="0">
+      </div>
+
+
+
+
+      <div class="form-group">
+        <label>
+          Transmission
+        </label>
+
+        <input
+          id="transmission"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="0">
+      </div>
+
+
+
+
+      <div class="form-group">
+        <label>
+          System Loss
+        </label>
+
+        <input
+          id="systemLoss"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="0">
+      </div>
+
+
+
+
+      <div class="form-group">
+        <label>
+          Distribution
+        </label>
+
+        <input
+          id="distribution"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="0">
+      </div>
+
+
+
+
+      <div class="form-group">
+        <label>
+          Senior Citizen
+        </label>
+
+        <input
+          id="seniorCitizen"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="0">
+      </div>
+
+
+
+
+      <div class="form-group">
+        <label>
+          Government Taxes
+        </label>
+
+        <input
+          id="governmentTaxes"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="0">
+      </div>
+
+
+
+
+      <div class="form-group">
+        <label>
+          Universal Charges
+        </label>
+
+        <input
+          id="universalCharges"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="0">
+      </div>
+
+
+
+
+      <div class="form-group">
+        <label>
+          FIT-All
+        </label>
+
+        <input
+          id="fitAll"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="0">
+      </div>
+
+
+
+
+      <div class="form-group">
+        <label>
+          GEA-All
+        </label>
+
+        <input
+          id="geaAll"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="0">
+      </div>
+
+
+
+
+      <div class="form-group">
+        <label>
+          Lifeline
+        </label>
+
+        <input
+          id="lifeline"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="0">
+      </div>
+
+
+
+
+      <div class="form-group">
+        <label>
+          Other Charges
+        </label>
+
+        <input
+          id="otherCharges"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="0">
+      </div>
+
+
+
+
+      <div class="form-group">
+
+        <label>
+          Actual Bill Amount (₱)
+        </label>
+
+        <input
+          id="actualBill"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="e.g. 4500"
+          required>
+
+      </div>
+
+
+
+
+      <div class="form-group">
+
+        <label>
+          Notes
+        </label>
+
+        <textarea
+          id="billNotes"
+          rows="3"
+          placeholder="Optional">
+        </textarea>
+
+      </div>
+
+
+
+
+      <div
+        id="billFormMessage"
+        class="form-message">
+      </div>
+
+
+
+
+      <div class="modal-actions">
+
+
+        <button
+          type="button"
+          class="secondary-button"
+          onclick="closeActualBillModal()">
+
+          Cancel
+
+        </button>
+
+
+
+        <button
+          type="submit"
+          class="primary-button">
+
+          Save Bill
+
+        </button>
+
+
+      </div>
+
+
+
+    </form>
+
+
+  </div>
+
+
+</div>
+
+
+  <!-- ==================================================
+       LOADING OVERLAY
+       ================================================== -->
+
+  <div
+    id="loadingOverlay"
+    class="loading-overlay hidden">
+
+    <div class="loading-box">
+
+      <div class="spinner">
+      </div>
+
+      <div id="loadingText">
+        Loading...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==================================================
+       TOAST
+       ================================================== -->
+
+  <div
+    id="toast"
+    class="toast">
+  </div>
+  
+<?!= include('scripts'); ?>
+
+
+
+
+<!-- =================================================
+     VIEW BILL MODAL
+     ================================================= -->
+
+<div
+  id="viewBillModal"
+  class="modal hidden"
+  onclick="event.stopPropagation();"
+>
+
+  <div class="modal-content">
+
+    <div class="modal-header">
+
+      <div>
+        <h2>
+          🧾 Electricity Bill Summary
+        </h2>
+
+        <p>
+          Your current electricity bill details.
+        </p>
+      </div>
+
+      <button
+        class="close-button"
+        onclick="closeBillModal()">
+
+        ×
+
+      </button>
+
+</div>
+
+
+
+    <div class="bill-content">
+
+
+      <div class="form-group">
+
+  <label>
+    Select Bill Month
+  </label>
+
+  <select
+  id="billMonthDropdown"
+  onchange="displaySelectedBill()">
+
+    <option value="">
+      No bills available
+    </option>
+
+  </select>
+
+</div>
+
+
+<div class="form-group">
+
+  <label>
+    Selected Month
+  </label>
+
+  <div id="billViewMonth">
+    —
+  </div>
+
+</div>
+
+
+
+
+
+      <div class="form-group">
+
+        <label>
+          Actual kWh
+        </label>
+
+        <div id="billViewKwh">
+          —
+        </div>
+
+      </div>
+
+<h3>
+  Electricity Charges
+</h3>
+
+
+<div onclick="event.stopPropagation();">
+  Generation:
+  <span id="billViewGeneration">₱0</span>
+
+  <input
+  id="editGeneration"
+  type="number"
+  step="0.01"
+  style="display:none;"
+>
+</div>
+
+
+<div onclick="event.stopPropagation();">
+  Transmission:
+  <span id="billViewTransmission">₱0</span>
+
+  <input
+    id="editTransmission"
+    type="number"
+    step="0.01"
+    style="display:none;"
+    onclick="event.stopPropagation();"
+    onmousedown="event.stopPropagation();"
+    onfocus="event.stopPropagation();"
+    oninput="event.stopPropagation();">
+</div>
+
+
+<div onclick="event.stopPropagation();">
+  System Loss:
+  <span id="billViewSystemLoss">₱0</span>
+
+  <input
+    id="editSystemLoss"
+    type="number"
+    step="0.01"
+    style="display:none;"
+    onclick="event.stopPropagation();"
+    onmousedown="event.stopPropagation();"
+    onfocus="event.stopPropagation();"
+    oninput="event.stopPropagation();">
+</div>
+
+
+<div onclick="event.stopPropagation();">
+  Distribution:
+  <span id="billViewDistribution">₱0</span>
+
+  <input
+    id="editDistribution"
+    type="number"
+    step="0.01"
+    style="display:none;"
+    onclick="event.stopPropagation();"
+    onmousedown="event.stopPropagation();"
+    onfocus="event.stopPropagation();"
+    oninput="event.stopPropagation();">
+</div>
+
+
+<div onclick="event.stopPropagation();">
+  Senior Citizen:
+  <span id="billViewSeniorCitizen">₱0</span>
+
+  <input
+    id="editSeniorCitizen"
+    type="number"
+    step="0.01"
+    style="display:none;"
+    onclick="event.stopPropagation();"
+    onmousedown="event.stopPropagation();"
+    onfocus="event.stopPropagation();"
+    oninput="event.stopPropagation();">
+</div>
+
+
+<div onclick="event.stopPropagation();">
+  Government Taxes:
+  <span id="billViewGovernmentTaxes">₱0</span>
+
+  <input
+    id="editGovernmentTaxes"
+    type="number"
+    step="0.01"
+    style="display:none;"
+    onclick="event.stopPropagation();"
+    onmousedown="event.stopPropagation();"
+    onfocus="event.stopPropagation();"
+    oninput="event.stopPropagation();">
+</div>
+
+
+<div onclick="event.stopPropagation();">
+  Universal Charges:
+  <span id="billViewUniversalCharges">₱0</span>
+
+  <input
+    id="editUniversalCharges"
+    type="number"
+    step="0.01"
+    style="display:none;"
+    onclick="event.stopPropagation();"
+    onmousedown="event.stopPropagation();"
+    onfocus="event.stopPropagation();"
+    oninput="event.stopPropagation();">
+</div>
+
+
+<div onclick="event.stopPropagation();">
+  FIT-All:
+  <span id="billViewFitAll">₱0</span>
+
+  <input
+    id="editFitAll"
+    type="number"
+    step="0.01"
+    style="display:none;"
+    onclick="event.stopPropagation();"
+    onmousedown="event.stopPropagation();"
+    onfocus="event.stopPropagation();"
+    oninput="event.stopPropagation();">
+</div>
+
+
+<div onclick="event.stopPropagation();">
+  GEA-All:
+  <span id="billViewGeaAll">₱0</span>
+
+  <input
+    id="editGeaAll"
+    type="number"
+    step="0.01"
+    style="display:none;"
+    onclick="event.stopPropagation();"
+    onmousedown="event.stopPropagation();"
+    onfocus="event.stopPropagation();"
+    oninput="event.stopPropagation();">
+</div>
+
+
+<div onclick="event.stopPropagation();">
+  Lifeline:
+  <span id="billViewLifeline">₱0</span>
+
+  <input
+    id="editLifeline"
+    type="number"
+    step="0.01"
+    style="display:none;"
+    onclick="event.stopPropagation();"
+    onmousedown="event.stopPropagation();"
+    onfocus="event.stopPropagation();"
+    oninput="event.stopPropagation();">
+</div>
+
+
+<div onclick="event.stopPropagation();">
+  Other Charges:
+  <span id="billViewOtherCharges">₱0</span>
+
+  <input
+    id="editOtherCharges"
+    type="number"
+    step="0.01"
+    style="display:none;"
+    onclick="event.stopPropagation();"
+    onmousedown="event.stopPropagation();"
+    onfocus="event.stopPropagation();"
+    oninput="event.stopPropagation();">
+</div>
+
+      <br>
+
+
+      <div class="form-group">
+
+        <label>
+          Total Actual Bill
+        </label>
+
+
+        <div
+          id="billViewAmount"
+          class="summary-value">
+
+          —
+
+        </div>
+
+      </div>
+
+
+
+    
+
+        <div
+    id="billViewMessage"
+    class="comparison-message">
+
+  </div>
+
+
+<!-- BILL ACTION BUTTONS -->
+<div class="bill-actions">
+
+  <button
+  type="button"
+  id="editBillButton"
+  class="edit-bill-button">
+  Edit Bill
+</button>
+
+
+  <button
+    id="saveBillButton"
+    type="button"
+    onclick="saveBillChanges();"
+    style="display:none;">
+    💾 Save Changes
+  </button>
+
+</div>
+
+
+  </div>
+
+
+</div>
+
+
+  </div>
+
+
+</div>
+</div>
+</div>
+
+
+</body>
+
+</html>
