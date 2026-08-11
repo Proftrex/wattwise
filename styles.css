@@ -1,4 +1,4 @@
-
+<style>
 
 /* =====================================================
    GLOBAL
@@ -152,8 +152,8 @@ textarea {
   border-radius:
     8px;
 
-  min-height:
-48px;
+  padding:
+    9px 14px;
 
   cursor:
     pointer;
@@ -457,8 +457,8 @@ textarea {
   border-radius:
     8px;
 
-  min-height:
- 48px;
+  padding:
+    11px 17px;
 
   font-weight:
     700;
@@ -494,8 +494,8 @@ textarea {
   border-radius:
     8px;
 
-  min-height:
- 48px;
+  padding:
+    11px 17px;
 
   font-weight:
     600;
@@ -1679,10 +1679,10 @@ form {
 
   .app-container {
 
-padding:
-16px 16px 80px;
+    padding:
+      18px 12px 40px;
 
-}
+  }
 
 
   .header-inner {
@@ -1706,8 +1706,8 @@ padding:
     font-size:
       12px;
 
-    min-height:
-48px;
+    padding:
+      8px 10px;
 
   }
 
@@ -1977,271 +1977,7 @@ padding:
 
 
 #appHeader {
-
-  display: flex;
-
+  display: none;
 }
 
-
-@media(max-width:650px){
-
-  .app-header {
-
-    position: sticky;
-    top:0;
-    z-index:500;
-
-  }
-
-
-  .header-inner {
-
-    padding:
-      12px 15px;
-
-  }
-
-
-  .app-title {
-
-    font-size:
-      20px;
-
-  }
-
-
-}
-
-
-
-@media(max-width:650px){
-
-  body {
-    background:
-      var(--background);
-  }
-
-
-  .app-header {
-
-    position: sticky;
-    top:0;
-    z-index:500;
-
-  }
-
-
-  .header-inner {
-
-    padding:
-      12px 15px;
-
-  }
-
-
-  .app-title {
-
-    font-size:
-      18px;
-
-  }
-
-
-  .app-subtitle {
-
-    display:none;
-
-  }
-
-
-  .header-button {
-
-    min-height:
-      40px;
-
-    min-height:
-48px;
-
-  }
-
-
-  .app-container {
-
-    padding:
-      15px 12px 90px;
-
-  }
-
-
-  .dashboard-top {
-
-    flex-direction:
-      column;
-
-    align-items:
-      stretch;
-
-    gap:
-      12px;
-
-  }
-
-
-  .month-selector {
-
-    width:
-      100%;
-
-  }
-
-
-  .summary-grid {
-
-    grid-template-columns:
-      1fr;
-
-    gap:
-      12px;
-
-  }
-
-
-  .summary-card {
-
-    padding:
-      16px;
-
-  }
-
-
-  .summary-value {
-
-    font-size:
-      22px;
-
-  }
-
-
-  .quick-actions {
-
-    display:
-      grid;
-
-    grid-template-columns:
-      1fr;
-
-  }
-
-
-  .quick-actions button {
-
-    width:
-      100%;
-
-    min-height:
-      48px;
-
-  }
-
-
-  .dashboard-card {
-
-    border-radius:
-      12px;
-
-  }
-
-
-  .card-header {
-
-    padding:
-      15px;
-
-  }
-
-
-  .table-wrapper {
-
-    overflow-x:
-      auto;
-
-  }
-
-
-  table {
-
-    min-width:
-      700px;
-
-  }
-
-
-  .modal {
-
-    align-items:
-      flex-end;
-
-    padding:
-      0;
-
-  }
-
-
-  .modal-content {
-
-    width:
-      100%;
-
-    max-height:
-      90vh;
-
-    border-radius:
-      18px 18px 0 0;
-
-  }
-
-
-  .modal-header {
-
-    padding:
-      16px;
-
-  }
-
-
-  form {
-
-    padding:
-      16px;
-
-  }
-
-
-}
-
-
-.modal-content {
-
-  width: 100%;
-  max-width: 760px;
-
-  max-height: 95vh;
-
-  border-radius: 15px;
-
-}
-
-.modal-header {
-
- padding:
- 18px;
-
-}
-
-
-form {
-
- padding:
- 18px;
-
-}
+</style>
