@@ -1,0 +1,4804 @@
+<script>
+
+/* =====================================================
+   GLOBAL STATE
+   ===================================================== */
+
+const APP = {
+
+  userId:'',
+  email:'',
+  householdName:'',
+  month:'',
+  dashboard:null,
+  appliances:[],
+  actualBills:[]
+
+};
+
+
+/* =====================================================
+   INITIALIZATION
+   ===================================================== */
+
+document.addEventListener(
+  'DOMContentLoaded',
+  function() {
+
+    initializeApp();
+
+    const editButton =
+      document.getElementById(
+        'editBillButton'
+      );
+
+    console.log(
+      'EDIT BUTTON FOUND:',
+      editButton
+    );
+
+    if (editButton) {
+
+      editButton.addEventListener(
+        'click',
+        function() {
+
+          console.log(
+            'EDIT CLICK'
+          );
+
+          enableBillEdit();
+
+        }
+      );
+
+    }
+
+  }
+);
+
+
+
+function initializeApp() {
+
+  const now =
+    new Date();
+
+
+  APP.month =
+    now.getFullYear() +
+    '-' +
+    String(
+      now.getMonth() + 1
+    ).padStart(
+      2,
+      '0'
+    );
+
+
+  const monthSelector =
+  document.getElementById('selectedMonth');
+
+if (monthSelector) {
+
+  monthSelector.innerHTML = '';
+
+  const currentDate = new Date();
+
+  for (let i = 0; i < 12; i++) {
+
+    const date = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() - i,
+      1
+    );
+
+    const year =
+      date.getFullYear();
+
+    const month =
+      String(
+        date.getMonth() + 1
+      ).padStart(2, '0');
+
+    const option =
+      document.createElement('option');
+
+    option.value =
+      `${year}-${month}`;
+
+    option.textContent =
+      date.toLocaleDateString(
+        'en-US',
+        {
+          month: 'long',
+          year: 'numeric'
+        }
+      );
+
+    monthSelector.appendChild(option);
+  }
+
+  monthSelector.value =
+    APP.month;
+}
+
+
+  document
+    .getElementById(
+      'rateMonth'
+    )
+    .value =
+    APP.month;
+
+
+  document
+    .getElementById(
+      'billMonth'
+    )
+    .value =
+    APP.month;
+
+
+  /*
+   * ==================================================
+   * RESTORE EMAIL / HOUSEHOLD ONLY
+   *
+   * DO NOT restore the User ID from localStorage.
+   *
+   * The real User ID must always come from
+   * getUserIdByEmail().
+   * ==================================================
+   */
+
+  const savedEmail =
+    localStorage.getItem(
+      'electricityTrackerEmail'
+    );
+
+
+  const savedHousehold =
+    localStorage.getItem(
+      'electricityTrackerHousehold'
+    );
+
+
+  if (savedEmail) {
+
+    document
+      .getElementById(
+        'userEmail'
+      )
+      .value =
+      savedEmail;
+
+
+    document
+      .getElementById(
+        'householdName'
+      )
+      .value =
+      savedHousehold ||
+      'My Household';
+
+
+    /*
+     * Clear any old/stale User ID.
+     */
+    localStorage.removeItem(
+      'electricityTrackerUserId'
+    );
+
+
+    APP.userId =
+      '';
+
+
+    APP.email =
+      savedEmail;
+
+
+    APP.householdName =
+      savedHousehold ||
+      'My Household';
+
+  }
+
+}
+
+
+
+/* =====================================================
+   HOUSEHOLD SETUP
+   ===================================================== */
+function startTracker() {
+
+  const email =
+    document
+      .getElementById(
+        'userEmail'
+      )
+      .value
+      .trim()
+      .toLowerCase();
+
+  const householdName =
+    document
+      .getElementById(
+        'householdName'
+      )
+      .value
+      .trim();
+
+
+  if (!email) {
+
+    showToast(
+      'Please enter your email.'
+    );
+
+    return;
+  }
+
+
+  if (!isValidEmail(email)) {
+
+    showToast(
+      'Please enter a valid email address.'
+    );
+
+    return;
+  }
+
+
+  APP.email =
+    email;
+
+  APP.householdName =
+    householdName ||
+    'My Household';
+
+
+  console.log(
+    'Looking up user by email: ' +
+    email
+  );
+
+
+  showLoading(
+    'Loading your household...'
+  );
+
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(result) {
+
+        hideLoading();
+
+
+        if (
+          !result ||
+          !result.success
+        ) {
+
+          console.error(
+            'Unable to find user:',
+            result
+          );
+
+          showToast(
+            result &&
+            result.message
+              ? result.message
+              : 'User account not found.'
+          );
+
+          return;
+        }
+
+
+        /*
+         * ==================================================
+         * IMPORTANT
+         *
+         * Use the REAL User ID from the Users sheet.
+         *
+         * Example:
+         *
+         * trexia.olaya@pdax.ph
+         *            ↓
+         *         USER-006
+         * ==================================================
+         */
+
+        APP.userId =
+          result.userId;
+
+/*
+ * ==================================================
+ * CREATE USER SPREADSHEET IF MISSING
+ * ==================================================
+ */
+
+if (
+  !result.spreadsheetId
+) {
+
+  console.log(
+    "No spreadsheet found. Creating household spreadsheet..."
+  );
+
+
+  showLoading(
+    "Creating your household spreadsheet..."
+  );
+
+
+  google.script.run
+
+  .withSuccessHandler(
+    function(sheetResult){
+
+      console.log(
+        "Spreadsheet created:",
+        sheetResult
+      );
+
+
+      if(
+        !sheetResult ||
+        !sheetResult.success
+      ){
+
+        showToast(
+          sheetResult.message ||
+          "Unable to create household spreadsheet."
+        );
+
+        hideLoading();
+
+        return;
+
+      }
+
+
+      console.log(
+        "Spreadsheet ID:",
+        sheetResult.data.id
+      );
+
+
+      console.log(
+        "Spreadsheet URL:",
+        sheetResult.data.url
+      );
+
+
+      continueLoadingApp();
+
+      console.log(
+  "Continuing app after spreadsheet creation"
+);
+
+console.log(
+  "Current APP.userId:",
+  APP.userId
+);
+
+console.log(
+  "Current APP.email:",
+  APP.email
+);
+
+    }
+  )
+
+  .withFailureHandler(
+    function(error){
+
+      console.error(
+        error
+      );
+
+      hideLoading();
+
+      showToast(
+        getErrorMessage(error)
+      );
+
+    }
+  )
+
+  .getUserSpreadsheet(
+    APP.userId
+  );
+
+
+  return;
+
+}
+
+        console.log(
+          '================================'
+        );
+
+        console.log(
+          'LOGIN SUCCESS'
+        );
+
+        console.log(
+          'Email: ' +
+          result.email
+        );
+
+        console.log(
+          'Actual User ID: ' +
+          APP.userId
+        );
+
+        console.log(
+          'Household: ' +
+          result.householdName
+        );
+
+        console.log(
+          'Access Status: ' +
+          result.accessStatus
+        );
+
+        console.log(
+          '================================'
+        );
+
+
+        /*
+         * ==================================================
+         * SAVE ONLY AFTER USER ID HAS BEEN FOUND
+         * ==================================================
+         */
+
+        localStorage.setItem(
+          'electricityTrackerEmail',
+          APP.email
+        );
+
+        localStorage.setItem(
+          'electricityTrackerHousehold',
+          APP.householdName
+        );
+
+        localStorage.setItem(
+          'electricityTrackerUserId',
+          APP.userId
+        );
+
+
+        /*
+         * ==================================================
+         * NOW LOAD THE APPLICATION
+         * ==================================================
+         */
+
+        if(
+  result.spreadsheetId
+){
+
+  continueLoadingApp();
+
+}
+
+      }
+    )
+
+    .withFailureHandler(
+      function(error) {
+
+        hideLoading();
+
+        console.error(
+          'User lookup failed:',
+          error
+        );
+
+        showToast(
+          getErrorMessage(error)
+        );
+
+      }
+    )
+
+    .getUserIdByEmail(
+      email
+    );
+
+}
+
+
+/* =====================================================
+   SHOW DASHBOARD
+   ===================================================== */
+
+function showDashboard() {
+
+  document
+    .getElementById(
+      'setupSection'
+    )
+    .classList
+    .add(
+      'hidden'
+    );
+
+
+  document
+    .getElementById(
+      'dashboardSection'
+    )
+    .classList
+    .remove(
+      'hidden'
+    );
+
+
+  document
+    .getElementById(
+      'householdGreeting'
+    )
+    .textContent =
+    APP.householdName;
+
+
+}
+
+
+/* =====================================================
+   REFRESH DASHBOARD
+   ===================================================== */
+
+function refreshDashboard() {
+
+  if (!APP.userId) {
+
+    return;
+
+  }
+
+
+  const month =
+    document
+      .getElementById(
+        'selectedMonth'
+      )
+      .value ||
+    APP.month;
+
+
+  APP.month =
+    month;
+
+
+  showLoading(
+    'Updating your electricity dashboard...'
+  );
+
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(result) {
+
+        hideLoading();
+
+
+        if (
+          !result ||
+          !result.success
+        ) {
+
+          showToast(
+            result &&
+            result.message
+              ? result.message
+              : 'Unable to load dashboard.'
+          );
+
+          return;
+
+        }
+
+
+        APP.dashboard =
+          result.data;
+
+
+        renderDashboard(
+          result.data
+        );
+
+
+        loadAppliances();
+
+      }
+    )
+
+    .withFailureHandler(
+      function(error) {
+
+        hideLoading();
+
+        showToast(
+          getErrorMessage(
+            error
+          )
+        );
+
+      }
+    )
+
+    .getDashboard(
+      APP.userId,
+      month
+    );
+
+}
+
+
+/* =====================================================
+   RENDER DASHBOARD
+   ===================================================== */
+
+function renderDashboard(
+  data
+) {
+
+  if (!data) {
+    return;
+  }
+
+
+  /**
+   * Summary.
+   */
+  document
+    .getElementById(
+      'totalCost'
+    )
+    .textContent =
+    formatPHP(
+      data.currentMonth.totalCost
+    );
+
+
+  document
+    .getElementById(
+      'totalKwh'
+    )
+    .textContent =
+    formatNumber(
+      data.currentMonth.totalKwh,
+      2
+    ) +
+    ' kWh';
+
+
+  document
+    .getElementById(
+      'electricityRate'
+    )
+    .textContent =
+    formatPHP(
+      data.currentMonth.electricityRate
+    );
+
+console.log(
+  "Electricity rate received:",
+  data.currentMonth.electricityRate
+);
+
+  /**
+   * Highest consumer.
+   */
+  if (
+    data.highestConsumer
+  ) {
+
+    document
+      .getElementById(
+        'highestConsumer'
+      )
+      .textContent =
+      data.highestConsumer
+        .applianceName;
+
+
+    document
+      .getElementById(
+        'highestConsumerCost'
+      )
+      .textContent =
+      formatPHP(
+        data.highestConsumer
+          .monthlyCost
+      ) +
+      ' / month';
+
+  } else {
+
+    document
+      .getElementById(
+        'highestConsumer'
+      )
+      .textContent =
+      'None yet';
+
+
+    document
+      .getElementById(
+        'highestConsumerCost'
+      )
+      .textContent =
+      'Add your appliances';
+
+  }
+
+
+  /**
+   * Month-to-month change.
+   */
+  renderChange(
+    'costChange',
+    data.comparison
+      .costPercentageChange,
+    data.comparison
+      .costChange
+  );
+
+
+  renderChange(
+    'kwhChange',
+    data.comparison
+      .kwhPercentageChange,
+    data.comparison
+      .kwhChange
+  );
+
+
+  /**
+   * Ranking.
+   */
+  renderRanking(
+    data.applianceRanking
+  );
+
+
+  /**
+   * Categories.
+   */
+  renderCategories(
+    data.categoryBreakdown
+  );
+
+
+  /**
+   * Alerts.
+   */
+  renderAlerts(
+    data.alerts
+  );
+
+
+  /**
+   * Actual bill.
+   */
+  renderActualBill(
+    data.actualBill
+  );
+
+
+  /**
+   * Tip.
+   */
+  generateEnergyTip(
+    data
+  );
+
+}
+
+
+/* =====================================================
+   CHANGE DISPLAY
+   ===================================================== */
+
+function renderChange(
+  elementId,
+  percentage,
+  difference
+) {
+
+  const element =
+    document.getElementById(
+      elementId
+    );
+
+
+  percentage =
+    Number(
+      percentage || 0
+    );
+
+
+  difference =
+    Number(
+      difference || 0
+    );
+
+
+  if (
+    Math.abs(
+      percentage
+    ) < 0.01
+  ) {
+
+    element.textContent =
+      'No significant change';
+
+    return;
+
+  }
+
+
+  if (
+    percentage > 0
+  ) {
+
+    element.textContent =
+      '↑ ' +
+      formatNumber(
+        Math.abs(
+          percentage
+        ),
+        1
+      ) +
+      '% vs previous month';
+
+    element.style.color =
+      '#c45151';
+
+  } else {
+
+    element.textContent =
+      '↓ ' +
+      formatNumber(
+        Math.abs(
+          percentage
+        ),
+        1
+      ) +
+      '% vs previous month';
+
+    element.style.color =
+      '#3b9141';
+
+  }
+
+}
+
+
+/* =====================================================
+   RENDER RANKING
+   ===================================================== */
+
+function renderRanking(
+  ranking
+) {
+
+  const container =
+    document.getElementById(
+      'applianceRanking'
+    );
+
+
+  container.innerHTML =
+    '';
+
+
+  if (
+    !ranking ||
+    ranking.length === 0
+  ) {
+
+    container.innerHTML =
+      '<div class="empty-state">' +
+      'Add appliances to see your biggest electricity consumers.' +
+      '</div>';
+
+    return;
+
+  }
+
+
+  const maxCost =
+    Math.max.apply(
+      null,
+      ranking.map(
+        function(item) {
+
+          return Number(
+            item.monthlyCost || 0
+          );
+
+        }
+      )
+    );
+
+
+  ranking
+    .slice(
+      0,
+      8
+    )
+    .forEach(
+      function(item, index) {
+
+        const percentage =
+          maxCost > 0
+            ? (
+                Number(
+                  item.monthlyCost
+                ) /
+                maxCost
+              ) * 100
+            : 0;
+
+
+        const div =
+          document.createElement(
+            'div'
+          );
+
+
+        div.className =
+          'ranking-item';
+
+
+        div.innerHTML = `
+
+          <div class="ranking-top">
+
+            <div class="ranking-name">
+
+              ${index + 1}.
+              ${escapeHtml(
+                item.applianceName
+              )}
+
+            </div>
+
+            <div class="ranking-cost">
+
+              ${formatPHP(
+                item.monthlyCost
+              )}
+
+            </div>
+
+          </div>
+
+
+          <div class="ranking-meta">
+
+            <span>
+              ${formatNumber(
+                item.monthlyKwh,
+                2
+              )} kWh/month
+            </span>
+
+            <span>
+              ${formatNumber(
+                item.percentageContribution,
+                1
+              )}%
+            </span>
+
+          </div>
+
+
+          <div class="progress-bar">
+
+            <div
+              class="progress-fill"
+              style="width:${percentage}%">
+            </div>
+
+          </div>
+
+        `;
+
+
+        container.appendChild(
+          div
+        );
+
+      }
+    );
+
+}
+
+
+/* =====================================================
+   RENDER CATEGORIES
+   ===================================================== */
+
+function renderCategories(
+  categories
+) {
+
+  const container =
+    document.getElementById(
+      'categoryBreakdown'
+    );
+
+
+  container.innerHTML =
+    '';
+
+
+  if (
+    !categories ||
+    categories.length === 0
+  ) {
+
+    container.innerHTML =
+      '<div class="empty-state">' +
+      'No category data yet.' +
+      '</div>';
+
+    return;
+
+  }
+
+
+  categories.forEach(
+    function(item) {
+
+      const div =
+        document.createElement(
+          'div'
+        );
+
+
+      div.className =
+        'category-item';
+
+
+      div.innerHTML = `
+
+        <div class="category-top">
+
+          <div class="category-name">
+
+            ${escapeHtml(
+              item.category
+            )}
+
+          </div>
+
+          <div class="category-cost">
+
+            ${formatPHP(
+              item.monthlyCost
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="ranking-meta">
+
+          <span>
+            ${formatNumber(
+              item.monthlyKwh,
+              2
+            )} kWh
+          </span>
+
+          <span>
+            ${formatNumber(
+              item.percentageContribution,
+              1
+            )}%
+          </span>
+
+        </div>
+
+
+        <div class="progress-bar">
+
+          <div
+            class="progress-fill"
+            style="width:${Math.min(
+              Number(
+                item.percentageContribution ||
+                0
+              ),
+              100
+            )}%">
+          </div>
+
+        </div>
+
+      `;
+
+
+      container.appendChild(
+        div
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   RENDER ALERTS
+   ===================================================== */
+
+function renderAlerts(
+  alerts
+) {
+
+  const container =
+    document.getElementById(
+      'alertContainer'
+    );
+
+
+  container.innerHTML =
+    '';
+
+
+  if (
+    !alerts ||
+    alerts.length === 0
+  ) {
+
+    container.classList.add(
+      'hidden'
+    );
+
+    return;
+
+  }
+
+
+  container.classList.remove(
+    'hidden'
+  );
+
+
+  const highest =
+    alerts[0];
+
+
+  container.innerHTML = `
+
+    <div style="
+      background:#fff8e8;
+      border:1px solid #f2d18b;
+      border-radius:10px;
+      padding:15px 18px;
+      margin-bottom:18px;
+    ">
+
+      <strong>
+        ⚠️ High electricity consumers
+      </strong>
+
+      <div style="
+        margin-top:5px;
+        font-size:13px;
+      ">
+
+        ${escapeHtml(
+          highest.applianceName
+        )}
+        is one of your biggest electricity
+        consumers at approximately
+        <strong>
+          ${formatPHP(
+            highest.monthlyCost
+          )}
+        </strong>
+        per month.
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+
+
+function renderActualBill(actual) {
+
+  const amount =
+    document.getElementById(
+      'actualBillAmount'
+    );
+
+  const message =
+    document.getElementById(
+      'actualBillMessage'
+    );
+
+
+  if (!amount || !message) {
+
+    console.error(
+      'Actual bill dashboard elements not found.'
+    );
+
+    return;
+
+  }
+
+
+  console.log(
+    'RENDERING ACTUAL BILL',
+    actual
+  );
+
+
+  const estimated =
+    APP.dashboard &&
+    APP.dashboard.currentMonth
+      ? Number(
+          APP.dashboard.currentMonth.totalCost || 0
+        )
+      : 0;
+
+
+  const actualAmount =
+    actual
+      ? Number(
+          actual.amount || 0
+        )
+      : 0;
+
+
+
+  // No actual bill yet
+  if (
+    actualAmount <= 0
+  ) {
+
+    amount.textContent =
+      formatPHP(
+        estimated
+      );
+
+
+    message.textContent =
+      'Enter your actual electricity bill to compare it with your estimate.';
+
+
+    return;
+
+  }
+
+
+console.log("ESTIMATE:", estimated);
+console.log("ACTUAL:", actualAmount);
+console.log("DISPLAY TEXT:", 
+  formatPHP(estimated) + " vs " + formatPHP(actualAmount)
+);
+
+
+  // Show estimate vs actual
+  amount.textContent =
+    formatPHP(
+      estimated
+    )
+    +
+    ' vs '
+    +
+    formatPHP(
+      actualAmount
+    );
+
+
+
+  // Comparison message
+  if (
+    estimated < actualAmount
+  ) {
+
+    message.textContent =
+      'Your estimated bill is lower than your actual electricity bill.';
+
+  }
+  else if (
+    estimated > actualAmount
+  ) {
+
+    message.textContent =
+      'Your estimated bill is higher than your actual electricity bill.';
+
+  }
+  else {
+
+    message.textContent =
+      'Your estimated bill matches your actual electricity bill.';
+
+  }
+
+
+}
+
+
+
+
+/* =====================================================
+   ENERGY TIP
+   ===================================================== */
+
+function generateEnergyTip(
+  data
+) {
+
+  const tip =
+    document.getElementById(
+      'energyTip'
+    );
+
+
+  if (
+    !data ||
+    !data.applianceRanking ||
+    !data.applianceRanking.length
+  ) {
+
+    tip.textContent =
+      'Add your appliances to see which ones are using the most electricity.';
+
+    return;
+
+  }
+
+
+  const top =
+    data.applianceRanking[0];
+
+
+  const name =
+    String(
+      top.applianceName ||
+      ''
+    ).toLowerCase();
+
+
+  if (
+    name.indexOf(
+      'aircon'
+    ) !== -1
+    ||
+    name.indexOf(
+      'air conditioner'
+    ) !== -1
+  ) {
+
+    tip.textContent =
+      'Your aircon is a major contributor. Check your thermostat setting, clean the filters regularly, and use energy-saving settings when possible.';
+
+    return;
+
+  }
+
+
+  if (
+    name.indexOf(
+      'refrigerator'
+    ) !== -1
+    ||
+    name.indexOf(
+      'fridge'
+    ) !== -1
+  ) {
+
+    tip.textContent =
+      'Your refrigerator runs all day. Keep the door closed as much as possible and make sure the door seal is working properly.';
+
+    return;
+
+  }
+
+
+  tip.textContent =
+    top.applianceName +
+    ' is currently your biggest estimated electricity consumer. Consider reviewing its usage hours first.';
+
+}
+
+
+/* =====================================================
+   LOAD APPLIANCES
+   ===================================================== */
+
+function loadAppliances() {
+
+  if (!APP.userId) {
+    return;
+  }
+
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(result) {
+
+        if (
+          !result ||
+          !result.success
+        ) {
+
+          return;
+
+        }
+
+
+        APP.appliances =
+          result.data || [];
+
+
+        renderApplianceTable(
+          APP.appliances
+        );
+
+      }
+    )
+
+    .withFailureHandler(
+      function(error) {
+
+        console.error(
+          error
+        );
+
+      }
+    )
+
+    .getAppliances(
+      APP.userId
+    );
+
+}
+
+
+/* =====================================================
+   RENDER APPLIANCE TABLE
+   ===================================================== */
+
+function renderApplianceTable(
+  appliances
+) {
+
+  const tbody =
+    document.getElementById(
+      'applianceTableBody'
+    );
+
+
+  tbody.innerHTML =
+    '';
+
+
+  if (
+    !appliances ||
+    appliances.length === 0
+  ) {
+
+    tbody.innerHTML = `
+
+      <tr>
+
+        <td
+          colspan="8"
+          class="empty-state">
+
+          No appliances added yet.
+
+        </td>
+
+      </tr>
+
+    `;
+
+    return;
+
+  }
+
+
+  const calculations =
+    APP.dashboard &&
+    APP.dashboard.applianceRanking
+      ? APP.dashboard.applianceRanking
+      : [];
+
+
+  appliances.forEach(
+    function(appliance) {
+
+      const calculation =
+        calculations.find(
+          function(item) {
+
+            return (
+              item.applianceId ===
+              appliance['Appliance ID']
+            );
+
+          }
+        );
+
+
+      const row =
+        document.createElement(
+          'tr'
+        );
+
+
+      row.innerHTML = `
+
+        <td>
+
+          <div class="table-appliance-name">
+
+            ${escapeHtml(
+              appliance['Appliance Name'] ||
+              ''
+            )}
+
+          </div>
+
+          <div class="table-category">
+
+            ${escapeHtml(
+              appliance['Brand / Model'] ||
+              ''
+            )}
+
+          </div>
+
+        </td>
+
+
+        <td>
+
+          ${escapeHtml(
+            appliance['Category'] ||
+            ''
+          )}
+
+        </td>
+
+
+        <td>
+
+          ${formatNumber(
+            appliance['Wattage'] || 0,
+            0
+          )}
+          W
+
+        </td>
+
+
+        <td>
+
+          ${formatUsage(
+            appliance
+          )}
+
+        </td>
+
+
+        <td>
+
+          ${
+            calculation
+              ? formatNumber(
+                  calculation.monthlyKwh,
+                  2
+                ) + ' kWh'
+              : '—'
+          }
+
+        </td>
+
+
+        <td>
+
+          ${
+            calculation
+              ? formatPHP(
+                  calculation.monthlyCost
+                )
+              : '—'
+          }
+
+        </td>
+
+
+        <td>
+
+          ${
+            calculation
+              ? formatNumber(
+                  calculation.percentageContribution,
+                  1
+                ) + '%'
+              : '—'
+          }
+
+        </td>
+
+
+        <td>
+
+          <button
+            class="action-button"
+            title="Edit"
+            onclick="editAppliance(
+              '${escapeAttribute(
+                appliance['Appliance ID']
+              )}'
+            )">
+
+            ✏️
+
+          </button>
+
+
+          <button
+            class="action-button delete-action"
+            title="Delete"
+            onclick="deleteAppliance(
+              '${escapeAttribute(
+                appliance['Appliance ID']
+              )}'
+            )">
+
+            🗑️
+
+          </button>
+
+        </td>
+
+      `;
+
+
+      tbody.appendChild(
+        row
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   FORMAT USAGE
+   ===================================================== */
+
+function formatUsage(
+  appliance
+) {
+
+  const usageType =
+    appliance['Usage Type'] ||
+    '';
+
+
+  if (
+    usageType ===
+    'Continuous (24/7)'
+  ) {
+
+    return '24/7';
+
+  }
+
+
+  const hours =
+    Number(
+      appliance['Hours Per Day'] || 0
+    );
+
+
+  if (
+    usageType ===
+    'Hours per day'
+  ) {
+
+    return (
+      formatNumber(
+        hours,
+        1
+      ) +
+      ' hrs/day'
+    );
+
+  }
+
+
+  if (
+    usageType ===
+    'Uses per day'
+  ) {
+
+    return (
+      Number(
+        appliance['Uses Per Day'] || 0
+      ) +
+      ' uses/day'
+    );
+
+  }
+
+
+  if (
+    usageType ===
+    'Uses per week'
+  ) {
+
+    return (
+      Number(
+        appliance['Uses Per Week'] || 0
+      ) +
+      ' uses/week'
+    );
+
+  }
+
+
+  if (
+    usageType ===
+    'Uses per month'
+  ) {
+
+    return (
+      Number(
+        appliance['Uses Per Month'] || 0
+      ) +
+      ' uses/month'
+    );
+
+  }
+
+
+  return '—';
+
+}
+
+
+/* =====================================================
+   ADD APPLIANCE MODAL
+   ===================================================== */
+
+function openAddApplianceModal() {
+
+  resetApplianceForm();
+
+
+  document
+    .getElementById(
+      'applianceModalTitle'
+    )
+    .textContent =
+    'Add Appliance';
+
+
+  document
+    .getElementById(
+      'applianceModal'
+    )
+    .classList
+    .remove(
+      'hidden'
+    );
+
+
+  updateSpecialFields();
+
+}
+
+
+/* =====================================================
+   EDIT APPLIANCE
+   ===================================================== */
+
+function editAppliance(
+  applianceId
+) {
+
+  const appliance =
+    APP.appliances.find(
+      function(item) {
+
+        return (
+          item['Appliance ID'] ===
+          applianceId
+        );
+
+      }
+    );
+
+
+  if (!appliance) {
+
+    showToast(
+      'Appliance could not be found.'
+    );
+
+    return;
+
+  }
+
+
+  document
+    .getElementById(
+      'applianceModalTitle'
+    )
+    .textContent =
+    'Edit Appliance';
+
+
+  document
+    .getElementById(
+      'applianceId'
+    )
+    .value =
+    appliance['Appliance ID'] || '';
+
+
+  document
+    .getElementById(
+      'applianceName'
+    )
+    .value =
+    appliance['Appliance Name'] || '';
+
+
+  document
+    .getElementById(
+      'applianceCategory'
+    )
+    .value =
+    appliance['Category'] || '';
+
+
+  document
+    .getElementById(
+      'brandModel'
+    )
+    .value =
+    appliance['Brand / Model'] || '';
+
+
+  document
+    .getElementById(
+      'wattage'
+    )
+    .value =
+    appliance['Wattage'] || '';
+
+
+  document
+    .getElementById(
+      'quantity'
+    )
+    .value =
+    appliance['Quantity'] || 1;
+
+
+  document
+    .getElementById(
+      'usageType'
+    )
+    .value =
+    appliance['Usage Type'] ||
+    'Hours per day';
+
+
+  document
+    .getElementById(
+      'hoursPerDay'
+    )
+    .value =
+    appliance['Hours Per Day'] || 1;
+
+
+  document
+    .getElementById(
+      'usesPerDay'
+    )
+    .value =
+    appliance['Uses Per Day'] || 1;
+
+
+  document
+    .getElementById(
+      'usesPerWeek'
+    )
+    .value =
+    appliance['Uses Per Week'] || 1;
+
+
+  document
+    .getElementById(
+      'usesPerMonth'
+    )
+    .value =
+    appliance['Uses Per Month'] || 1;
+
+
+  document
+    .getElementById(
+      'daysPerMonth'
+    )
+    .value =
+    appliance['Days Per Month'] || 30;
+
+
+  document
+    .getElementById(
+      'airconHp'
+    )
+    .value =
+    appliance['Aircon HP'] || '';
+
+
+  document
+    .getElementById(
+      'airconType'
+    )
+    .value =
+    appliance['Aircon Type'] || '';
+
+
+  document
+    .getElementById(
+      'cookingHours'
+    )
+    .value =
+    appliance['Cooking Hours'] || 1;
+
+
+  document
+    .getElementById(
+      'warmModeHours'
+    )
+    .value =
+    appliance['Warm Mode Hours'] || 0;
+
+
+  document
+    .getElementById(
+      'estimatedKwhPerDay'
+    )
+    .value =
+    appliance['Estimated kWh Per Day'] || '';
+
+
+  document
+    .getElementById(
+      'applianceModal'
+    )
+    .classList
+    .remove(
+      'hidden'
+    );
+
+
+  updateUsageFields();
+
+  updateSpecialFields();
+
+}
+
+
+/* =====================================================
+   SAVE APPLIANCE
+   ===================================================== */
+
+function saveAppliance(
+  event
+) {
+
+  event.preventDefault();
+
+console.log('APP.userId = ' + APP.userId);
+
+  const data = {
+
+    applianceId:
+      document
+        .getElementById(
+          'applianceId'
+        )
+        .value,
+
+    userId:
+      APP.userId,
+
+    applianceName:
+      document
+        .getElementById(
+          'applianceName'
+        )
+        .value
+        .trim(),
+
+    category:
+      document
+        .getElementById(
+          'applianceCategory'
+        )
+        .value,
+
+    brandModel:
+      document
+        .getElementById(
+          'brandModel'
+        )
+        .value
+        .trim(),
+
+    wattage:
+      Number(
+        document
+          .getElementById(
+            'wattage'
+          )
+          .value
+      ),
+
+    quantity:
+      Number(
+        document
+          .getElementById(
+            'quantity'
+          )
+          .value
+      ),
+
+    usageType:
+      document
+        .getElementById(
+          'usageType'
+        )
+        .value,
+
+    hoursPerDay:
+      Number(
+        document
+          .getElementById(
+            'hoursPerDay'
+          )
+          .value
+      ),
+
+    usesPerDay:
+      Number(
+        document
+          .getElementById(
+            'usesPerDay'
+          )
+          .value
+      ),
+
+    usesPerWeek:
+      Number(
+        document
+          .getElementById(
+            'usesPerWeek'
+          )
+          .value
+      ),
+
+    usesPerMonth:
+      Number(
+        document
+          .getElementById(
+            'usesPerMonth'
+          )
+          .value
+      ),
+
+    daysPerMonth:
+      Number(
+        document
+          .getElementById(
+            'daysPerMonth'
+          )
+          .value
+      ),
+
+    airconHp:
+      Number(
+        document
+          .getElementById(
+            'airconHp'
+          )
+          .value
+      ),
+
+    airconType:
+      document
+        .getElementById(
+          'airconType'
+        )
+        .value,
+
+    cookingHours:
+      Number(
+        document
+          .getElementById(
+            'cookingHours'
+          )
+          .value
+      ),
+
+    warmModeHours:
+      Number(
+        document
+          .getElementById(
+            'warmModeHours'
+          )
+          .value
+      ),
+
+    estimatedKwhPerDay:
+      Number(
+        document
+          .getElementById(
+            'estimatedKwhPerDay'
+          )
+          .value
+      ) || 0
+
+  };
+
+
+  /**
+   * Client-side validation.
+   */
+  if (
+    !data.applianceName
+  ) {
+
+    showFormMessage(
+      'applianceFormMessage',
+      'Please enter the appliance name.'
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !data.category
+  ) {
+
+    showFormMessage(
+      'applianceFormMessage',
+      'Please select a category.'
+    );
+
+    return;
+
+  }
+
+
+  if (
+    data.wattage <= 0
+  ) {
+
+    showFormMessage(
+      'applianceFormMessage',
+      'Please enter a wattage greater than zero.'
+    );
+
+    return;
+
+  }
+
+
+  if (
+    data.quantity <= 0
+  ) {
+
+    showFormMessage(
+      'applianceFormMessage',
+      'Quantity must be at least 1.'
+    );
+
+    return;
+
+  }
+
+
+  showLoading(
+    'Saving appliance...'
+  );
+
+
+  const functionName =
+    data.applianceId
+      ? 'updateAppliance'
+      : 'addAppliance';
+
+
+  const runner =
+    google.script.run
+
+      .withSuccessHandler(
+        function(result) {
+
+          hideLoading();
+
+
+          if (
+            !result ||
+            !result.success
+          ) {
+
+            showFormMessage(
+              'applianceFormMessage',
+              result &&
+              result.message
+                ? result.message
+                : 'Unable to save appliance.'
+            );
+
+            return;
+
+          }
+
+
+          closeApplianceModal();
+
+
+          showToast(
+            data.applianceId
+              ? 'Appliance updated successfully.'
+              : 'Appliance added successfully.'
+          );
+
+
+          refreshDashboard();
+
+        }
+      )
+
+      .withFailureHandler(
+        function(error) {
+
+          hideLoading();
+
+
+          showFormMessage(
+            'applianceFormMessage',
+            getErrorMessage(
+              error
+            )
+          );
+
+        }
+      );
+
+
+  if (
+    data.applianceId
+  ) {
+
+    runner.updateAppliance(
+      data
+    );
+
+  } else {
+
+    runner.addAppliance(
+      data
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   DELETE APPLIANCE
+   ===================================================== */
+
+function deleteAppliance(
+  applianceId
+) {
+
+  const appliance =
+    APP.appliances.find(
+      function(item) {
+
+        return (
+          item['Appliance ID'] ===
+          applianceId
+        );
+
+      }
+    );
+
+
+  const name =
+    appliance
+      ? appliance['Appliance Name']
+      : 'this appliance';
+
+
+  const confirmed =
+    confirm(
+      'Are you sure you want to delete ' +
+      name +
+      '?'
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  showLoading(
+    'Deleting appliance...'
+  );
+
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(result) {
+
+        hideLoading();
+
+
+        if (
+          !result ||
+          !result.success
+        ) {
+
+          showToast(
+            result &&
+            result.message
+              ? result.message
+              : 'Unable to delete appliance.'
+          );
+
+          return;
+
+        }
+
+
+        showToast(
+          'Appliance deleted successfully.'
+        );
+
+
+        refreshDashboard();
+
+      }
+    )
+
+    .withFailureHandler(
+      function(error) {
+
+        hideLoading();
+
+        showToast(
+          getErrorMessage(
+            error
+          )
+        );
+
+      }
+    )
+
+    .deleteAppliance(
+      applianceId,
+      APP.userId
+    );
+
+}
+
+
+/* =====================================================
+   RESET APPLIANCE FORM
+   ===================================================== */
+
+function resetApplianceForm() {
+
+  document
+    .getElementById(
+      'applianceForm'
+    )
+    .reset();
+
+
+  document
+    .getElementById(
+      'applianceId'
+    )
+    .value =
+    '';
+
+
+  document
+    .getElementById(
+      'quantity'
+    )
+    .value =
+    1;
+
+
+  document
+    .getElementById(
+      'hoursPerDay'
+    )
+    .value =
+    1;
+
+
+  document
+    .getElementById(
+      'daysPerMonth'
+    )
+    .value =
+    30;
+
+
+  document
+    .getElementById(
+      'cookingHours'
+    )
+    .value =
+    1;
+
+
+  document
+    .getElementById(
+      'warmModeHours'
+    )
+    .value =
+    0;
+
+
+  document
+    .getElementById(
+      'applianceFormMessage'
+    )
+    .textContent =
+    '';
+
+
+  updateUsageFields();
+
+  updateSpecialFields();
+
+}
+
+
+/* =====================================================
+   USAGE FIELD DISPLAY
+   ===================================================== */
+
+function updateUsageFields() {
+
+  const usageType =
+    document
+      .getElementById(
+        'usageType'
+      )
+      .value;
+
+
+  hideElement(
+    'usesPerDayGroup'
+  );
+
+  hideElement(
+    'usesPerWeekGroup'
+  );
+
+  hideElement(
+    'usesPerMonthGroup'
+  );
+
+
+  if (
+    usageType ===
+    'Uses per day'
+  ) {
+
+    showElement(
+      'usesPerDayGroup'
+    );
+
+  }
+
+
+  if (
+    usageType ===
+    'Uses per week'
+  ) {
+
+    showElement(
+      'usesPerWeekGroup'
+    );
+
+  }
+
+
+  if (
+    usageType ===
+    'Uses per month'
+  ) {
+
+    showElement(
+      'usesPerMonthGroup'
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   SPECIAL APPLIANCE FIELDS
+   ===================================================== */
+
+function updateSpecialFields() {
+
+  const name =
+    document
+      .getElementById(
+        'applianceName'
+      )
+      .value
+      .toLowerCase();
+
+
+  hideElement(
+    'airconFields'
+  );
+
+
+  hideElement(
+    'riceCookerFields'
+  );
+
+
+  if (
+    name.indexOf(
+      'aircon'
+    ) !== -1
+    ||
+    name.indexOf(
+      'air conditioner'
+    ) !== -1
+  ) {
+
+    showElement(
+      'airconFields'
+    );
+
+  }
+
+
+  if (
+    name.indexOf(
+      'rice cooker'
+    ) !== -1
+  ) {
+
+    showElement(
+      'riceCookerFields'
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   APPLIANCE NAME LISTENER
+   ===================================================== */
+
+document.addEventListener(
+  'input',
+  function(event) {
+
+    if (
+      event.target &&
+      event.target.id ===
+      'applianceName'
+    ) {
+
+      updateSpecialFields();
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   CLOSE APPLIANCE MODAL
+   ===================================================== */
+
+function closeApplianceModal() {
+
+  document
+    .getElementById(
+      'applianceModal'
+    )
+    .classList
+    .add(
+      'hidden'
+    );
+
+}
+
+
+/* =====================================================
+   RATE MODAL
+   ===================================================== */
+
+function openRateModal() {
+
+  document
+    .getElementById(
+      'rateMonth'
+    )
+    .value =
+    APP.month ||
+    getCurrentMonthLocal();
+
+
+  document
+    .getElementById(
+      'ratePerKwh'
+    )
+    .value =
+    APP.dashboard &&
+    APP.dashboard.currentMonth
+      ? APP.dashboard.currentMonth
+          .electricityRate
+      : '';
+
+
+  document
+    .getElementById(
+      'rateModal'
+    )
+    .classList
+    .remove(
+      'hidden'
+    );
+
+}
+
+
+function closeRateModal() {
+
+  document
+    .getElementById(
+      'rateModal'
+    )
+    .classList
+    .add(
+      'hidden'
+    );
+
+}
+
+
+/* =====================================================
+   SAVE RATE
+   ===================================================== */
+
+function saveRate(
+  event
+) {
+
+  event.preventDefault();
+
+
+  const data = {
+
+    month:
+      document
+        .getElementById(
+          'rateMonth'
+        )
+        .value,
+
+    ratePerKwh:
+      Number(
+        document
+          .getElementById(
+            'ratePerKwh'
+          )
+          .value
+      ),
+
+    provider:
+      document
+        .getElementById(
+          'rateProvider'
+        )
+        .value
+        .trim(),
+
+    notes:
+      document
+        .getElementById(
+          'rateNotes'
+        )
+        .value
+        .trim(),
+
+    status:
+      'Active'
+
+  };
+
+
+  if (
+    !data.month
+  ) {
+
+    showFormMessage(
+      'rateFormMessage',
+      'Please select a month.'
+    );
+
+    return;
+
+  }
+
+
+  if (
+    data.ratePerKwh <= 0
+  ) {
+
+    showFormMessage(
+      'rateFormMessage',
+      'Please enter a valid electricity rate.'
+    );
+
+    return;
+
+  }
+
+
+  showLoading(
+    'Saving electricity rate...'
+  );
+
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(result) {
+
+        hideLoading();
+
+
+        if (
+          !result ||
+          !result.success
+        ) {
+
+          showFormMessage(
+            'rateFormMessage',
+            result &&
+            result.message
+              ? result.message
+              : 'Unable to save rate.'
+          );
+
+          return;
+
+        }
+
+
+        closeRateModal();
+
+
+        showToast(
+          'Electricity rate saved successfully.'
+        );
+
+
+        refreshDashboard();
+
+      }
+    )
+
+    .withFailureHandler(
+      function(error) {
+
+        hideLoading();
+
+
+        showFormMessage(
+          'rateFormMessage',
+          getErrorMessage(
+            error
+          )
+        );
+
+      }
+    )
+
+    .addElectricityRate(
+      data
+    );
+
+}
+
+
+/* =====================================================
+   ACTUAL BILL MODAL
+   ===================================================== */
+
+function openActualBillModal() {
+
+  console.log(
+    "OPEN ACTUAL BILL MODAL"
+  );
+
+
+  /*
+   * Show loading message immediately
+   */
+  const loadingBox =
+    document.querySelector(
+      ".loading-box"
+    );
+
+  const loadingText =
+    document.getElementById(
+      "loadingText"
+    );
+
+
+  if(loadingText){
+
+    loadingText.textContent =
+  "Loading current bill...";
+
+  }
+
+
+  if(loadingBox){
+
+    loadingBox.style.display =
+      "flex";
+
+  }
+
+
+  /*
+   * Set current bill month
+   */
+  document
+    .getElementById(
+      "billMonth"
+    )
+    .value =
+    APP.month ||
+    getCurrentMonthLocal();
+
+
+  /*
+   * Open actual bill modal
+   */
+  document
+    .getElementById(
+      "actualBillModal"
+    )
+    .classList
+    .remove(
+      "hidden"
+    );
+
+}
+
+function closeActualBillModal() {
+
+  document
+    .getElementById(
+      'actualBillModal'
+    )
+    .classList
+    .add(
+      'hidden'
+    );
+
+}
+
+
+
+/* =====================================================
+   VIEW CURRENT BILL MODAL
+   ===================================================== */
+
+
+function openBillModal(){
+
+
+  console.log(
+    "OPEN ACTUAL BILL MODAL"
+  );
+
+
+  /*
+   * SAFETY CHECK
+   *
+   * If APP.userId is missing,
+   * rebuild it using the saved email.
+   */
+
+
+  if(!APP.userId){
+
+
+    const savedEmail =
+      localStorage.getItem(
+        'electricityTrackerEmail'
+      );
+
+
+    if(!savedEmail){
+
+
+      showToast(
+        "User session expired. Please login again."
+      );
+
+
+      return;
+
+
+    }
+
+
+
+    console.log(
+      "Recovering USER ID from email:",
+      savedEmail
+    );
+
+
+
+    google.script.run
+
+
+      .withSuccessHandler(
+        function(result){
+
+
+          console.log(
+            "Recovered user:",
+            result
+          );
+
+
+
+          if(
+            !result ||
+            !result.success
+          ){
+
+
+            showToast(
+              "Unable to recover user account."
+            );
+
+
+            return;
+
+
+          }
+
+
+
+          APP.userId =
+            result.userId;
+
+
+
+          console.log(
+            "Recovered USER ID:",
+            APP.userId
+          );
+
+
+
+          loadActualBills();
+
+
+
+        }
+      )
+
+
+      .withFailureHandler(
+        function(error){
+
+
+          console.error(
+            error
+          );
+
+
+        }
+      )
+
+
+      .getUserIdByEmail(
+        savedEmail
+      );
+
+
+
+    return;
+
+
+  }
+
+
+
+  loadActualBills();
+
+
+}
+
+
+
+
+
+
+function closeBillModal() {
+
+  document
+    .getElementById(
+      'viewBillModal'
+    )
+    .classList
+    .add(
+      'hidden'
+    );
+
+}
+
+
+/* =====================================================
+   SAVE ACTUAL BILL
+   ===================================================== */
+
+
+function saveActualBill(event) {
+
+  event.preventDefault();
+
+
+  const data = {
+
+
+    userId:
+      APP.userId,
+
+
+    billMonth:
+      document.getElementById(
+        "billMonth"
+      ).value,
+
+
+    actualBill:
+      Number(
+        document.getElementById(
+          "actualBill"
+        ).value
+      ),
+
+
+    actualKwh:
+      Number(
+        document.getElementById(
+          "actualKwh"
+        ).value
+      ),
+
+
+    generation:
+      Number(
+        document.getElementById(
+          "generation"
+        ).value
+      ),
+
+
+    transmission:
+      Number(
+        document.getElementById(
+          "transmission"
+        ).value
+      ),
+
+
+    systemLoss:
+      Number(
+        document.getElementById(
+          "systemLoss"
+        ).value
+      ),
+
+
+    distribution:
+      Number(
+        document.getElementById(
+          "distribution"
+        ).value
+      ),
+
+
+    seniorCitizen:
+      Number(
+        document.getElementById(
+          "seniorCitizen"
+        ).value
+      ),
+
+
+    governmentTaxes:
+      Number(
+        document.getElementById(
+          "governmentTaxes"
+        ).value
+      ),
+
+
+    universalCharges:
+      Number(
+        document.getElementById(
+          "universalCharges"
+        ).value
+      ),
+
+
+    fitAll:
+      Number(
+        document.getElementById(
+          "fitAll"
+        ).value
+      ),
+
+
+    geaAll:
+      Number(
+        document.getElementById(
+          "geaAll"
+        ).value
+      ),
+
+
+    lifeline:
+      Number(
+        document.getElementById(
+          "lifeline"
+        ).value
+      ),
+
+
+    otherCharges:
+      Number(
+        document.getElementById(
+          "otherCharges"
+        ).value
+      ),
+
+
+    notes:
+      document.getElementById(
+        "billNotes"
+      ).value
+
+  };
+
+
+  console.log(
+    "Saving actual bill:",
+    data
+  );
+
+
+const loadingOverlay =
+document.querySelector(
+  ".loading-overlay"
+);
+
+const loadingText =
+document.getElementById(
+  "loadingText"
+);
+
+
+if(loadingText){
+
+  loadingText.textContent =
+    "Saving actual bill...";
+
+}
+
+
+if(loadingOverlay){
+
+  loadingOverlay.classList.remove(
+    "hidden"
+  );
+
+}
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(response) {
+
+
+        console.log(
+          "Bill saved:",
+          response
+        );
+
+
+        if(
+          !response ||
+          !response.success
+        ){
+
+          showToast(
+            response &&
+            response.message
+              ? response.message
+              : "Unable to save bill."
+          );
+
+          return;
+
+        }
+
+
+        closeActualBillModal();
+
+
+        refreshDashboard();
+
+
+        showToast(
+          "Actual bill saved successfully!"
+        );
+
+
+      }
+    )
+
+
+    .withFailureHandler(
+      function(error) {
+
+
+        console.error(
+          "Save bill error:",
+          error
+        );
+
+
+        showToast(
+          getErrorMessage(error)
+        );
+
+
+      }
+    )
+
+
+    .saveActualBillDirect(
+      data
+    );
+
+}
+
+
+
+/* =====================================================
+   GENERIC UI HELPERS
+   ===================================================== */
+
+function showElement(
+  id
+) {
+
+  document
+    .getElementById(
+      id
+    )
+    .classList
+    .remove(
+      'hidden'
+    );
+
+}
+
+
+function hideElement(
+  id
+) {
+
+  document
+    .getElementById(
+      id
+    )
+    .classList
+    .add(
+      'hidden'
+    );
+
+}
+
+
+function showLoading(
+  text
+) {
+
+  document
+    .getElementById(
+      'loadingText'
+    )
+    .textContent =
+    text ||
+    'Loading...';
+
+
+  document
+    .getElementById(
+      'loadingOverlay'
+    )
+    .classList
+    .remove(
+      'hidden'
+    );
+
+}
+
+
+function hideLoading() {
+
+  document
+    .getElementById(
+      'loadingOverlay'
+    )
+    .classList
+    .add(
+      'hidden'
+    );
+
+}
+
+
+function showToast(
+  message
+) {
+
+  const toast =
+    document.getElementById(
+      'toast'
+    );
+
+
+  toast.textContent =
+    message;
+
+
+  toast.classList.add(
+    'show'
+  );
+
+
+  setTimeout(
+    function() {
+
+      toast.classList.remove(
+        'show'
+      );
+
+    },
+    3000
+  );
+
+}
+
+
+function showFormMessage(
+  id,
+  message
+) {
+
+  const element =
+    document.getElementById(
+      id
+    );
+
+
+  if (!element) {
+    return;
+  }
+
+
+  element.textContent =
+    message ||
+    '';
+
+}
+
+
+/* =====================================================
+   FORMATTERS
+   ===================================================== */
+
+function formatPHP(
+  value
+) {
+
+  value =
+    Number(
+      value || 0
+    );
+
+
+  return (
+    '₱' +
+    value.toLocaleString(
+      'en-PH',
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }
+    )
+  );
+
+}
+
+
+function formatNumber(
+  value,
+  decimals
+) {
+
+  value =
+    Number(
+      value || 0
+    );
+
+
+  return value.toLocaleString(
+    'en-PH',
+    {
+      minimumFractionDigits:
+        decimals || 0,
+
+      maximumFractionDigits:
+        decimals || 0
+    }
+  );
+
+}
+
+
+/* =====================================================
+   VALIDATION
+   ===================================================== */
+
+function isValidEmail(
+  email
+) {
+
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    .test(
+      email
+    );
+
+}
+
+
+/* =====================================================
+   SECURITY / HTML ESCAPING
+   ===================================================== */
+
+function escapeHtml(
+  value
+) {
+
+  return String(
+    value || ''
+  )
+    .replace(
+      /&/g,
+      '&amp;'
+    )
+    .replace(
+      /</g,
+      '&lt;'
+    )
+    .replace(
+      />/g,
+      '&gt;'
+    )
+    .replace(
+      /"/g,
+      '&quot;'
+    )
+    .replace(
+      /'/g,
+      '&#039;'
+    );
+
+}
+
+
+function escapeAttribute(
+  value
+) {
+
+  return String(
+    value || ''
+  )
+    .replace(
+      /'/g,
+      "\\'"
+    )
+    .replace(
+      /"/g,
+      '&quot;'
+    );
+
+}
+
+
+/* =====================================================
+   ERROR HANDLING
+   ===================================================== */
+
+function getErrorMessage(
+  error
+) {
+
+  if (!error) {
+
+    return 'An unknown error occurred.';
+
+  }
+
+
+  if (
+    typeof error ===
+    'string'
+  ) {
+
+    return error;
+
+  }
+
+
+  return (
+    error.message ||
+    'An unexpected error occurred.'
+  );
+
+}
+
+
+/* =====================================================
+   LOCAL DATE HELPERS
+   ===================================================== */
+
+function getCurrentMonthLocal() {
+
+  const now =
+    new Date();
+
+
+  return (
+    now.getFullYear() +
+    '-' +
+    String(
+      now.getMonth() + 1
+    ).padStart(
+      2,
+      '0'
+    )
+  );
+
+}
+
+
+
+
+function addBillChargeRow(){
+
+  const container =
+  document.getElementById(
+    "billChargesContainer"
+  );
+
+
+  const row =
+  document.createElement("div");
+
+
+  row.className =
+  "charge-row";
+
+
+  row.innerHTML = `
+
+    <select class="bill-charge-name">
+
+      <option value="">
+        Select Charge
+      </option>
+
+      <option value="Generation">
+        Generation
+      </option>
+
+      <option value="Transmission">
+        Transmission
+      </option>
+
+      <option value="System Loss">
+        System Loss
+      </option>
+
+      <option value="Distribution">
+        Distribution
+      </option>
+
+      <option value="Senior Citizen Discount">
+        Senior Citizen Discount
+      </option>
+
+      <option value="Government Taxes">
+        Government Taxes
+      </option>
+
+      <option value="Universal Charges">
+        Universal Charges
+      </option>
+
+      <option value="FIT-All">
+        FIT-All
+      </option>
+
+      <option value="GEA-All">
+        GEA-All
+      </option>
+
+      <option value="Lifeline">
+        Lifeline
+      </option>
+
+      <option value="Other Charges">
+        Other Charges
+      </option>
+
+    </select>
+
+
+    <input
+      class="bill-charge-amount"
+      type="number"
+      step="0.01"
+      placeholder="Amount">
+
+
+    <button
+      type="button"
+      onclick="this.parentElement.remove()">
+
+      ×
+
+    </button>
+
+  `;
+
+
+  container.appendChild(row);
+
+}
+
+
+
+
+
+function toggleOtherCharge(select){
+
+  const row =
+    select.parentElement;
+
+
+  const otherInput =
+    row.querySelector(
+      ".other-charge-name"
+    );
+
+
+  if(select.value === "Other"){
+
+    otherInput.classList.remove(
+      "hidden"
+    );
+
+    otherInput.required = true;
+
+  } else {
+
+    otherInput.classList.add(
+      "hidden"
+    );
+
+    otherInput.required = false;
+
+    otherInput.value = "";
+
+  }
+
+}
+
+
+
+
+
+function getBillCharges(){
+
+  const charges = [];
+
+
+  document
+    .querySelectorAll(
+      ".charge-row"
+    )
+    .forEach(function(row){
+
+
+      const name =
+        row
+        .querySelector(
+          ".bill-charge-name"
+        )
+        .value;
+
+
+      const amount =
+        Number(
+          row
+          .querySelector(
+            ".bill-charge-amount"
+          )
+          .value
+        );
+
+
+      if(
+        name &&
+        amount > 0
+      ){
+
+        charges.push({
+
+          name:name,
+
+          amount:amount
+
+        });
+
+      }
+
+
+    });
+
+
+  return charges;
+
+}
+
+
+
+
+
+
+function viewBill(){
+
+  openViewBillModal();
+
+}
+
+
+  console.log(
+    "VIEW BILL BUTTON CLICKED"
+  );
+
+
+  console.log(
+    "USER BEFORE OPEN BILL:",
+    APP.userId
+  );
+
+console.log(
+"CALLING LOAD ACTUAL BILLS WITH:",
+APP.userId
+);
+
+  openViewBillModal();
+
+
+}
+
+
+
+function populateBillMonths(){
+
+
+  const dropdown =
+    document.getElementById(
+      "billMonthDropdown"
+    );
+
+
+  if(!dropdown){
+
+    console.error(
+      "billMonthDropdown not found"
+    );
+
+    return;
+
+  }
+
+
+
+  dropdown.innerHTML = "";
+
+
+
+  console.log(
+    "POPULATING BILL MONTHS:",
+    APP.actualBills
+  );
+
+
+
+  if(
+    !Array.isArray(APP.actualBills) ||
+    APP.actualBills.length === 0
+  ){
+
+
+    dropdown.innerHTML =
+      `
+      <option value="">
+        No bills found
+      </option>
+      `;
+
+
+    return;
+
+  }
+
+
+
+  APP.actualBills.forEach(
+    function(bill){
+
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+
+      option.value =
+        bill.month;
+
+
+      option.textContent =
+        bill.month;
+
+
+      dropdown.appendChild(
+        option
+      );
+
+
+    }
+  );
+
+
+if(!dropdown.value && dropdown.options.length > 0){
+
+  dropdown.selectedIndex = 0;
+
+}
+
+displaySelectedBill();
+
+
+}
+
+
+
+function displaySelectedBill(){
+
+
+  const selectedMonth =
+    document
+      .getElementById(
+        "billMonthDropdown"
+      )
+      .value;
+
+
+
+  const bill =
+    APP.actualBills.find(
+      function(item){
+
+        return (
+          item.month === selectedMonth
+        );
+
+      }
+    );
+
+
+
+  console.log(
+    "SELECTED BILL:",
+    bill
+  );
+
+
+
+  if(!bill){
+
+    return;
+
+  }
+
+
+
+  document
+    .getElementById(
+      "billViewMonth"
+    )
+    .textContent =
+    bill.month || "—";
+
+
+
+  document
+    .getElementById(
+      "billViewAmount"
+    )
+    .textContent =
+    formatPHP(
+      bill.actualBill
+    );
+
+
+
+  document
+    .getElementById(
+      "billViewKwh"
+    )
+    .textContent =
+    formatNumber(
+      bill.actualKwh,
+      2
+    )
+    +
+    " kWh";
+
+
+
+  document
+.getElementById(
+"billViewGeneration"
+)
+.textContent =
+formatPHP(
+bill.generation
+);
+
+
+
+  document.getElementById("billViewTransmission").textContent = formatPHP(bill.transmission);
+
+
+
+  document.getElementById("billViewSystemLoss").textContent = formatPHP(bill.systemLoss);
+
+
+
+  document.getElementById("billViewDistribution").textContent = formatPHP(bill.distribution);
+
+
+
+  document.getElementById("billViewGovernmentTaxes").textContent = formatPHP(bill.governmentTaxes);
+
+document.getElementById("billViewUniversalCharges").textContent = formatPHP(bill.universalCharges);
+
+document.getElementById("billViewFitAll").textContent = formatPHP(bill.fitAll);
+
+document.getElementById("billViewGeaAll").textContent = formatPHP(bill.geaAll);
+
+document.getElementById("billViewLifeline").textContent = formatPHP(bill.lifeline);
+
+document.getElementById("billViewOtherCharges").textContent = formatPHP(bill.otherCharges);
+
+
+
+  document
+    .getElementById(
+      "billViewMessage"
+    )
+    .textContent =
+    bill.notes || "";
+
+// Fill edit fields
+document.getElementById("editGeneration").value = bill.generation || 0;
+document.getElementById("editTransmission").value = bill.transmission || 0;
+document.getElementById("editSystemLoss").value = bill.systemLoss || 0;
+document.getElementById("editDistribution").value = bill.distribution || 0;
+document.getElementById("editSeniorCitizen").value = bill.seniorCitizen || 0;
+document.getElementById("editGovernmentTaxes").value = bill.governmentTaxes || 0;
+document.getElementById("editUniversalCharges").value = bill.universalCharges || 0;
+document.getElementById("editFitAll").value = bill.fitAll || 0;
+document.getElementById("editGeaAll").value = bill.geaAll || 0;
+document.getElementById("editLifeline").value = bill.lifeline || 0;
+document.getElementById("editOtherCharges").value = bill.otherCharges || 0;
+
+}
+
+
+
+
+function changeBillMonth(){
+
+  displaySelectedBill();
+
+}
+
+
+
+
+
+function populateMonthDropdown(){
+
+  const select = document.getElementById("selectedMonth");
+
+  if(!select) return;
+
+  select.innerHTML = "";
+
+  const today = new Date();
+
+  for(let i = 0; i < 12; i++){
+
+    const date = new Date(
+      today.getFullYear(),
+      today.getMonth() - i,
+      1
+    );
+
+    const value =
+      date.getFullYear() +
+      "-" +
+      String(date.getMonth()+1).padStart(2,"0");
+
+
+    const label =
+      date.toLocaleString(
+        "default",
+        {
+          month:"long",
+          year:"numeric"
+        }
+      );
+
+
+    const option =
+      document.createElement("option");
+
+    option.value = value;
+    option.textContent = label;
+
+
+    select.appendChild(option);
+
+  }
+
+}
+
+
+
+
+function loadActualBills(){
+
+  console.log(
+    "LOADING ACTUAL BILLS"
+  );
+
+
+  /*
+   * Get loading overlay
+   */
+  const loadingOverlay =
+    document.querySelector(
+      ".loading-overlay"
+    );
+
+
+  /*
+   * Get loading text
+   */
+  const loadingText =
+    document.getElementById(
+      "loadingText"
+    );
+
+
+  /*
+   * Show loading message
+   */
+  if(loadingText){
+
+    loadingText.textContent =
+  "Loading bill history...";
+
+  }
+
+
+  /*
+   * Show loading overlay
+   */
+  if(loadingOverlay){
+
+    loadingOverlay.classList.remove(
+      "hidden"
+    );
+
+  }
+
+
+  /*
+   * Check USER ID
+   */
+  if(!APP.userId){
+
+    console.error(
+      "Missing USER ID"
+    );
+
+
+    /*
+     * Hide loading overlay
+     */
+    if(loadingOverlay){
+
+      loadingOverlay.classList.add(
+        "hidden"
+      );
+
+    }
+
+
+    return;
+
+  }
+
+
+  console.log(
+    "GETTING BILLS FOR USER:",
+    APP.userId
+  );
+
+
+  google.script.run
+
+    .withSuccessHandler(function(bills){
+
+
+      console.log(
+        "ACTUAL BILLS LOADED:",
+        bills
+      );
+
+
+      /*
+       * Store bills globally
+       */
+      APP.actualBills =
+        Array.isArray(bills)
+          ? bills
+          : [];
+
+
+      /*
+       * Populate View Bill dropdown
+       */
+      populateBillMonths();
+
+
+      /*
+       * Open View Bill modal
+       */
+      const modal =
+        document.getElementById(
+          "viewBillModal"
+        );
+
+
+      if(!modal){
+
+        console.error(
+          "viewBillModal not found"
+        );
+
+
+        /*
+         * Hide loading overlay
+         */
+        if(loadingOverlay){
+
+          loadingOverlay.classList.add(
+            "hidden"
+          );
+
+        }
+
+
+        return;
+
+      }
+
+
+      modal.classList.remove(
+        "hidden"
+      );
+
+
+      /*
+       * Hide loading overlay
+       * after bills finish loading
+       */
+      if(loadingOverlay){
+
+        loadingOverlay.classList.add(
+          "hidden"
+        );
+
+      }
+
+
+    })
+
+
+    .withFailureHandler(function(error){
+
+
+      console.error(
+        "FAILED TO LOAD ACTUAL BILLS:",
+        error
+      );
+
+
+      /*
+       * Hide loading overlay
+       * if loading fails
+       */
+      if(loadingOverlay){
+
+        loadingOverlay.classList.add(
+          "hidden"
+        );
+
+      }
+
+
+      showToast(
+        getErrorMessage(error)
+      );
+
+
+    })
+
+
+    .getActualBills(
+      APP.userId
+    );
+
+}
+
+
+
+function enableBillEdit(){
+
+  console.log(
+    "ENABLE BILL EDIT FIRED"
+  );
+
+
+  const fields = [
+    "Generation",
+    "Transmission",
+    "SystemLoss",
+    "Distribution",
+    "SeniorCitizen",
+    "GovernmentTaxes",
+    "UniversalCharges",
+    "FitAll",
+    "GeaAll",
+    "Lifeline",
+    "OtherCharges"
+  ];
+
+
+  fields.forEach(
+    function(field){
+
+      const input =
+        document.getElementById(
+          "edit" + field
+        );
+
+
+      const view =
+        document.getElementById(
+          "billView" + field
+        );
+
+
+      console.log(
+        field,
+        input,
+        input
+          ? input.value
+          : "NO INPUT"
+      );
+
+
+      if(input){
+
+        /*
+         * Only show the input.
+         *
+         * DO NOT overwrite its value here.
+         * displaySelectedBill() already
+         * populated the correct value.
+         */
+
+        input.style.display =
+          "inline-block";
+
+      }
+
+
+      if(view){
+
+        view.style.display =
+          "none";
+
+      }
+
+    }
+  );
+
+
+  const saveButton =
+    document.getElementById(
+      "saveBillButton"
+    );
+
+
+  if(saveButton){
+
+    saveButton.style.display =
+      "inline-block";
+
+  }
+
+
+  console.log(
+    "SAVE BUTTON SHOWED"
+  );
+
+}
+
+
+
+
+
+function saveBillChanges(){
+
+  console.log("SAVE BILL CHANGES FIRED");
+
+
+  const loadingOverlay =
+  document.querySelector(
+    ".loading-overlay"
+  );
+
+const loadingText =
+  document.getElementById(
+    "loadingText"
+  );
+
+if(loadingText){
+
+  loadingText.textContent =
+    "Saving changes...";
+
+}
+
+if(loadingOverlay){
+
+  loadingOverlay.classList.remove(
+    "hidden"
+  );
+
+}
+
+  const selectedMonth =
+    document.getElementById(
+      "billMonthDropdown"
+    ).value;
+
+  const bill =
+    APP.actualBills.find(
+      function(item){
+
+        return (
+          item.month === selectedMonth
+        );
+
+      }
+    );
+
+  console.log(
+    "BILL TO UPDATE:",
+    bill
+  );
+
+  if(!bill){
+
+    showToast(
+      "Unable to find the selected bill."
+    );
+
+    return;
+
+  }
+
+  const data = {
+
+    generation:
+      Number(
+        document.getElementById(
+          "editGeneration"
+        ).value
+      ) || 0,
+
+    transmission:
+      Number(
+        document.getElementById(
+          "editTransmission"
+        ).value
+      ) || 0,
+
+    systemLoss:
+      Number(
+        document.getElementById(
+          "editSystemLoss"
+        ).value
+      ) || 0,
+
+    distribution:
+      Number(
+        document.getElementById(
+          "editDistribution"
+        ).value
+      ) || 0,
+
+    seniorCitizen:
+      Number(
+        document.getElementById(
+          "editSeniorCitizen"
+        ).value
+      ) || 0,
+
+    governmentTaxes:
+      Number(
+        document.getElementById(
+          "editGovernmentTaxes"
+        ).value
+      ) || 0,
+
+    universalCharges:
+      Number(
+        document.getElementById(
+          "editUniversalCharges"
+        ).value
+      ) || 0,
+
+    fitAll:
+      Number(
+        document.getElementById(
+          "editFitAll"
+        ).value
+      ) || 0,
+
+    geaAll:
+      Number(
+        document.getElementById(
+          "editGeaAll"
+        ).value
+      ) || 0,
+
+    lifeline:
+      Number(
+        document.getElementById(
+          "editLifeline"
+        ).value
+      ) || 0,
+
+    otherCharges:
+      Number(
+        document.getElementById(
+          "editOtherCharges"
+        ).value
+      ) || 0,
+
+    actualBill:
+      Number(
+        bill.actualBill
+      ) || 0,
+
+    notes:
+      bill.notes || ""
+
+  };
+
+  console.log(
+    "UPDATE DATA:",
+    data
+  );
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(result){
+
+        if(loadingOverlay){
+
+  loadingOverlay.classList.add(
+    "hidden"
+  );
+
+}
+
+        console.log(
+          "UPDATE RESULT:",
+          result
+        );
+
+        if(
+          !result ||
+          !result.success
+        ){
+
+          showToast(
+            result &&
+            result.message
+              ? result.message
+              : "Unable to update bill."
+          );
+
+          return;
+
+        }
+
+        // Update the local bill object
+        bill.generation =
+          data.generation;
+
+        bill.transmission =
+          data.transmission;
+
+        bill.systemLoss =
+          data.systemLoss;
+
+        bill.distribution =
+          data.distribution;
+
+        bill.seniorCitizen =
+          data.seniorCitizen;
+
+        bill.governmentTaxes =
+          data.governmentTaxes;
+
+        bill.universalCharges =
+          data.universalCharges;
+
+        bill.fitAll =
+          data.fitAll;
+
+        bill.geaAll =
+          data.geaAll;
+
+        bill.lifeline =
+          data.lifeline;
+
+        bill.otherCharges =
+          data.otherCharges;
+
+        // Refresh the displayed values
+        displaySelectedBill();
+
+        // Hide edit fields
+        const fields = [
+          "Generation",
+          "Transmission",
+          "SystemLoss",
+          "Distribution",
+          "SeniorCitizen",
+          "GovernmentTaxes",
+          "UniversalCharges",
+          "FitAll",
+          "GeaAll",
+          "Lifeline",
+          "OtherCharges"
+        ];
+
+        fields.forEach(
+          function(field){
+
+            const input =
+              document.getElementById(
+                "edit" + field
+              );
+
+            const view =
+              document.getElementById(
+                "billView" + field
+              );
+
+            if(input){
+              input.style.display =
+                "none";
+            }
+
+            if(view){
+              view.style.display =
+                "inline";
+            }
+
+          }
+        );
+
+        document.getElementById(
+          "saveBillButton"
+        ).style.display =
+          "none";
+
+        showToast(
+          "Bill updated successfully."
+        );
+
+      }
+    )
+
+    .withFailureHandler(
+      function(error){
+
+        if(loadingOverlay){
+
+  loadingOverlay.classList.add(
+    "hidden"
+  );
+
+}
+
+        console.error(
+          "UPDATE BILL ERROR:",
+          error
+        );
+
+        showToast(
+          "Unable to update bill: " +
+          (
+            error.message ||
+            error
+          )
+        );
+
+      }
+    )
+
+    .updateSavedBill(
+      APP.userId,
+      bill.billId,
+      data
+    );
+
+
+}
+
+
+
+
+function continueLoadingApp(){
+
+  hideLoading();
+
+
+  localStorage.setItem(
+    'electricityTrackerUserId',
+    APP.userId
+  );
+
+
+  showDashboard();
+
+  loadAppliances();
+
+  refreshDashboard();
+
+}
+
+
+
+
+
+</script>
