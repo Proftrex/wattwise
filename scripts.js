@@ -1,4 +1,4 @@
-
+<script>
 
 /* =====================================================
    GLOBAL STATE
@@ -207,7 +207,7 @@ if (monthSelector) {
 }
 
 
-console.log("WattWise scripts.js loaded");
+
 /* =====================================================
    HOUSEHOLD SETUP
    ===================================================== */
@@ -3849,10 +3849,6 @@ function getBillCharges(){
 
 function viewBill(){
 
-  openViewBillModal();
-
-}
-
 
   console.log(
     "VIEW BILL BUTTON CLICKED"
@@ -3869,7 +3865,7 @@ console.log(
 APP.userId
 );
 
-  openViewBillModal();
+  openBillModal();
 
 
 }
@@ -4799,3 +4795,6 @@ function continueLoadingApp(){
 
 
 
+
+
+</script>
