@@ -3,8 +3,8 @@ const CACHE_NAME = "wattwise-cache-v1";
 const APP_FILES = [
   "./",
   "./index.html",
-  "./style.css",
-  "./script.js",
+  "./styles.css",
+  "./scripts.js",
   "./manifest.json"
 ];
 
