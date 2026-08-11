@@ -8,15 +8,11 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1">
 
-        <meta name="theme-color" content="#79d862">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-
-  <link rel="stylesheet" href="styles.css">
-  
   <title>
-    WattWise
+    Household Electricity Tracker
   </title>
+
+  <?!= include('styles'); ?>
 
 </head>
 
@@ -34,7 +30,7 @@
       <div>
 
         <div class="app-title">
-          ⚡ WattWise
+          ⚡ My Electricity Tracker
         </div>
 
         <div class="app-subtitle">
@@ -1598,7 +1594,8 @@
     id="toast"
     class="toast">
   </div>
-
+  
+<?!= include('scripts'); ?>
 
 
 
@@ -1931,47 +1928,6 @@
 </div>
 </div>
 </div>
-
- <script src="./scripts.js"></script>
-
-  <script>
-
-if ("serviceWorker" in navigator) {
-
-  window.addEventListener(
-    "load",
-    function() {
-
-      navigator.serviceWorker.register(
-        "./service-worker.js"
-      )
-      .then(
-        function() {
-
-          console.log(
-            "WattWise Service Worker Registered"
-          );
-
-        }
-      )
-      .catch(
-        function(error) {
-
-          console.error(
-            "Service Worker Error:",
-            error
-          );
-
-        }
-      );
-
-    }
-  );
-
-}
-
-</script>
-
 
 
 </body>
