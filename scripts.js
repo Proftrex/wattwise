@@ -275,8 +275,6 @@ function startTracker() {
     .withSuccessHandler(
       function(result) {
 
-        hideLoading();
-
 
         if (
           !result ||
@@ -542,16 +540,11 @@ function showDashboard() {
     );
 
 
-  document
-    .getElementById(
-      'householdGreeting'
-    )
-    .textContent =
-    APP.householdName;
+  document.getElementById('householdGreeting').textContent =
+  APP.householdName + 'WattWise Dashboard';
 
 
 }
-
 
 /* =====================================================
    REFRESH DASHBOARD
@@ -560,82 +553,68 @@ function showDashboard() {
 function refreshDashboard() {
 
   if (!APP.userId) {
-
     return;
-
   }
 
-
   const month =
-    document
-      .getElementById(
-        'selectedMonth'
-      )
-      .value ||
+    document.getElementById('selectedMonth').value ||
     APP.month;
 
+  APP.month = month;
 
-  APP.month =
-    month;
-
-
-  showLoading(
-    'Updating your electricity dashboard...'
+  console.log(
+    'Refreshing dashboard for:',
+    month
   );
 
-
+  /*
+   * Don't block the entire application
+   * while dashboard data loads.
+   */
   google.script.run
 
-    .withSuccessHandler(
-      function(result) {
+    .withSuccessHandler(function(result) {
 
-        hideLoading();
+      console.log(
+        'Dashboard data received:',
+        result
+      );
 
-
-        if (
-          !result ||
-          !result.success
-        ) {
-
-          showToast(
-            result &&
-            result.message
-              ? result.message
-              : 'Unable to load dashboard.'
-          );
-
-          return;
-
-        }
-
-
-        APP.dashboard =
-          result.data;
-
-
-        renderDashboard(
-          result.data
-        );
-
-
-        loadAppliances();
-
-      }
-    )
-
-    .withFailureHandler(
-      function(error) {
-
-        hideLoading();
+      if (
+        !result ||
+        !result.success
+      ) {
 
         showToast(
-          getErrorMessage(
-            error
-          )
+          result && result.message
+            ? result.message
+            : 'Unable to load dashboard.'
         );
 
+        return;
       }
-    )
+
+      APP.dashboard = result.data;
+
+      /*
+       * Render immediately.
+       */
+      renderDashboard(result.data);
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      console.error(
+        'Dashboard loading failed:',
+        error
+      );
+
+      showToast(
+        getErrorMessage(error)
+      );
+
+    })
 
     .getDashboard(
       APP.userId,
@@ -643,7 +622,6 @@ function refreshDashboard() {
     );
 
 }
-
 
 /* =====================================================
    RENDER DASHBOARD
@@ -4774,27 +4752,356 @@ if(loadingOverlay){
 
 
 
-function continueLoadingApp(){
+function continueLoadingApp() {
 
-  hideLoading();
-
+  console.log('Opening WattWise dashboard...');
 
   localStorage.setItem(
     'electricityTrackerUserId',
     APP.userId
   );
 
+  /*
+   * Show the application immediately.
+   */
+  hideLoading();
 
   showDashboard();
 
-  loadAppliances();
-
+  /*
+   * Load dashboard data.
+   * refreshDashboard() handles the dashboard.
+   */
   refreshDashboard();
+
+  /*
+   * Load appliance table separately.
+   */
+  loadAppliances();
 
 }
 
 
 
 
+
+
+
+function showMobileSection(section, button) {
+
+  console.log('================================');
+  console.log('SWITCHING MOBILE SECTION');
+  console.log('Section:', section);
+  console.log('Button:', button);
+
+  // =====================================================
+  // HIDE ALL MOBILE SECTIONS
+  // =====================================================
+
+  const sections =
+    document.querySelectorAll(
+      '.mobile-section'
+    );
+
+  console.log(
+    'Mobile sections found:',
+    sections.length
+  );
+
+  sections.forEach(
+    function(el) {
+
+      el.classList.remove(
+        'mobile-section-active'
+      );
+
+      el.style.display =
+        'none';
+
+    }
+  );
+
+
+  // =====================================================
+  // REMOVE ACTIVE NAVIGATION STATE
+  // =====================================================
+
+  const navItems =
+    document.querySelectorAll(
+      '.mobile-nav-item'
+    );
+
+  console.log(
+    'Navigation items found:',
+    navItems.length
+  );
+
+  navItems.forEach(
+    function(el) {
+
+      el.classList.remove(
+        'active'
+      );
+
+    }
+  );
+
+
+  // =====================================================
+  // FIND SELECTED SECTION
+  // =====================================================
+
+  const selectedSection =
+    document.getElementById(
+      'mobile-' + section
+    );
+
+  console.log(
+    'Looking for:',
+    'mobile-' + section
+  );
+
+  console.log(
+    'Selected section:',
+    selectedSection
+  );
+
+
+  if (!selectedSection) {
+
+    console.error(
+      'ERROR: Section not found:',
+      'mobile-' + section
+    );
+
+    return;
+
+  }
+
+
+  // =====================================================
+  // SHOW SELECTED SECTION
+  // =====================================================
+selectedSection.classList.add('mobile-section-active');
+
+selectedSection.style.setProperty(
+  'display',
+  'block',
+  'important'
+);
+
+console.log(
+  'CATEGORY/SECTION DISPLAY AFTER SHOW:',
+  selectedSection.id,
+  selectedSection.style.display,
+  getComputedStyle(selectedSection).display
+);
+
+  // =====================================================
+  // ACTIVATE NAVIGATION BUTTON
+  // =====================================================
+
+  if (button) {
+
+    button.classList.add(
+      'active'
+    );
+
+  }
+
+
+  console.log(
+    'Section successfully displayed:',
+    selectedSection.id
+  );
+
+
+  // =====================================================
+  // DASHBOARD
+  // =====================================================
+
+  if (
+    section === 'dashboard'
+  ) {
+
+    console.log(
+      'Loading dashboard...'
+    );
+
+
+    if (
+      typeof refreshDashboard ===
+      'function'
+    ) {
+
+      refreshDashboard();
+
+    }
+
+    return;
+
+  }
+
+
+  // =====================================================
+  // RANKING
+  //
+  // We do NOT call loadApplianceRanking()
+  // because you don't have that function.
+  //
+  // The ranking data already comes from:
+  //
+  // APP.dashboard.applianceRanking
+  // =====================================================
+
+  if (
+    section === 'ranking'
+  ) {
+
+    console.log(
+      'Loading ranking from APP.dashboard...'
+    );
+
+
+    if (
+      APP.dashboard &&
+      APP.dashboard.applianceRanking
+    ) {
+
+      console.log(
+        'Ranking data found:',
+        APP.dashboard.applianceRanking
+      );
+
+
+      renderRanking(
+        APP.dashboard.applianceRanking
+      );
+
+    } else {
+
+      console.log(
+        'No dashboard ranking data yet.'
+      );
+
+
+      // If dashboard has not loaded yet,
+      // load it first.
+
+      if (
+        typeof refreshDashboard ===
+        'function'
+      ) {
+
+        refreshDashboard();
+
+      }
+
+    }
+
+    return;
+
+  }
+
+
+  // =====================================================
+  // CATEGORIES
+  //
+  // We do NOT call loadCategoryBreakdown()
+  // because you don't have that function.
+  //
+  // The category data already comes from:
+  //
+  // APP.dashboard.categoryBreakdown
+  // =====================================================
+
+  if (
+    section === 'categories'
+  ) {
+
+    console.log(
+      'Loading categories from APP.dashboard...'
+    );
+
+
+    if (
+      APP.dashboard &&
+      APP.dashboard.categoryBreakdown
+    ) {
+
+      console.log(
+        'Category data found:',
+        APP.dashboard.categoryBreakdown
+      );
+
+
+      renderCategories(
+        APP.dashboard.categoryBreakdown
+      );
+
+    } else {
+
+      console.log(
+        'No dashboard category data yet.'
+      );
+
+
+      // If dashboard has not loaded yet,
+      // load it first.
+
+      if (
+        typeof refreshDashboard ===
+        'function'
+      ) {
+
+        refreshDashboard();
+
+      }
+
+    }
+
+    return;
+
+  }
+
+
+  // =====================================================
+  // APPLIANCES
+  // =====================================================
+
+  if (
+    section === 'appliances'
+  ) {
+
+    console.log(
+      'Loading appliances...'
+    );
+
+
+    if (
+      typeof loadAppliances ===
+      'function'
+    ) {
+
+      console.log(
+        'loadAppliances() FOUND'
+      );
+
+
+      loadAppliances();
+
+    } else {
+
+      console.error(
+        'loadAppliances() NOT FOUND'
+      );
+
+    }
+
+    return;
+
+  }
+
+}
 
 </script>
