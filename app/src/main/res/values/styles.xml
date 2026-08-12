@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+
+        <!-- WattWise brand -->
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:colorAccent">#79D862</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor">#79D862</item>
+        <item name="android:navigationBarColor">#000000</item>
+
+        <!-- Light status bar icons -->
+        <item name="android:windowLightStatusBar">false</item>
+
+        <!-- Prevent the app from drawing behind system bars -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
+        <!-- Splash background -->
+        <item name="android:windowBackground">#FFFFFF</item>
+
+    </style>
+
+</resources>

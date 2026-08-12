@@ -1,0 +1,75 @@
+import java.util.Properties
+import java.io.FileInputStream
+
+plugins {
+id 'com.android.application'
+}
+
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+def releaseSigningEnabled = false
+
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+    def storeFileValue = keystoreProperties['storeFile']
+    def storePasswordValue = keystoreProperties['storePassword']
+    def keyAliasValue = keystoreProperties['keyAlias']
+    def keyPasswordValue = keystoreProperties['keyPassword']
+
+    if (storeFileValue && storePasswordValue && keyAliasValue && keyPasswordValue) {
+        def resolvedStoreFile = storeFileValue.toString().startsWith('/')
+                ? new File(storeFileValue.toString())
+                : rootProject.file(storeFileValue.toString())
+        releaseSigningEnabled = resolvedStoreFile.exists()
+    }
+}
+
+android {
+    namespace 'com.wattwise.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.wattwise.app"
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        release {
+            if (releaseSigningEnabled) {
+                def storeFileValue = keystoreProperties['storeFile'].toString()
+                def resolvedStoreFile = storeFileValue.startsWith('/')
+                        ? new File(storeFileValue)
+                        : rootProject.file(storeFileValue)
+                storeFile resolvedStoreFile
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            if (releaseSigningEnabled) {
+                signingConfig signingConfigs.release
+            }
+            minifyEnabled false
+        }
+    }
+}
+
+configurations.all {
+resolutionStrategy {
+force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'
+force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22'
+force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22'
+}
+}
+
+dependencies {
+implementation 'androidx.appcompat:appcompat:1.7.0'
+}
