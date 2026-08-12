@@ -30,12 +30,12 @@
       <div>
 
         <div class="app-title">
-          ⚡ My Electricity Tracker
-        </div>
+  ⚡ WattWise
+</div>
 
-        <div class="app-subtitle">
-          Understand where your electricity goes.
-        </div>
+<div class="app-subtitle">
+  Track your watts before your wallet gets electerrified.
+</div>
 
       </div>
 
@@ -76,7 +76,7 @@
       </h2>
 
       <p>
-      Track your watts before your wallet gets shocked.
+      Track your watts before your wallet gets electerrified.
       </p>
 
       <div class="form-group">
@@ -127,465 +127,464 @@
       class="hidden">
 
 
-      <!-- ===============================================
-           DASHBOARD TOP
-           =============================================== -->
-
-      <div class="dashboard-top">
-
-        <div>
-
-          <h1>
-            Your WattWise Dashboard
-          </h1>
-
-          <p id="householdGreeting">
-            Your household
-          </p>
-
-        </div>
-
-
-        <div class="month-selector">
-
-  <label for="selectedMonth">
-    Month
-  </label>
-
-  <select
-  id="selectedMonth"
-  onchange="refreshDashboard()">
-</select>
-
-</div>
-
-      </div>
-
-
-      <!-- ===============================================
-           SUMMARY CARDS
-           =============================================== -->
-
-      <div class="summary-grid">
-
-
-        <div class="summary-card">
-
-          <div class="summary-icon">
-            💰
-          </div>
-
-          <div class="summary-label">
-            Estimated Monthly Bill
-          </div>
-
-          <div
-            id="totalCost"
-            class="summary-value">
-
-            ₱0.00
-
-          </div>
-
-          <div
-            id="costChange"
-            class="summary-change">
-
-            —
-
-          </div>
-
-        </div>
-
-
-        <div class="summary-card">
-
-          <div class="summary-icon">
-            ⚡
-          </div>
-
-          <div class="summary-label">
-            Estimated Consumption
-          </div>
-
-          <div
-            id="totalKwh"
-            class="summary-value">
-
-            0 kWh
-
-          </div>
-
-          <div
-            id="kwhChange"
-            class="summary-change">
-
-            —
-
-          </div>
-
-        </div>
-
-
-        <div class="summary-card">
-
-          <div class="summary-icon">
-            🔌
-          </div>
-
-          <div class="summary-label">
-            Electricity Rate
-          </div>
-
-          <div
-            id="electricityRate"
-            class="summary-value">
-
-            ₱0.00
-
-          </div>
-
-          <div class="summary-small">
-            per kWh
-          </div>
-
-        </div>
-
-
-        <div class="summary-card">
-
-          <div class="summary-icon">
-            🏆
-          </div>
-
-          <div class="summary-label">
-            Highest Consumer
-          </div>
-
-          <div
-            id="highestConsumer"
-            class="summary-value summary-text">
-
-            —
-
-          </div>
-
-          <div
-            id="highestConsumerCost"
-            class="summary-small">
-
-            —
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- ===============================================
-           ALERT
-           =============================================== -->
-
-      <div
-        id="alertContainer"
-        class="alert-container hidden">
-      </div>
-
-
-  <!-- ===============================================
-     QUICK ACTIONS
-     =============================================== -->
-
-<div class="quick-actions">
-
-  <button
-    class="primary-button"
-    onclick="openAddApplianceModal()">
-
-    + Add Appliance
-
-  </button>
-
-
-  <button
-    class="secondary-button"
-    onclick="openRateModal()">
-
-    ₱ Electricity Rate
-
-  </button>
-
-
-  <button
-    class="secondary-button"
-    onclick="openActualBillModal()">
-
-    🧾 Enter Actual Bill
-
-  </button>
-
-
-  <button
-    class="secondary-button"
-    onclick="viewBill()">
-
-    📄 View  Bill Histories
-
-  </button>
-
+  <!-- =================================================
+       DASHBOARD
+       ================================================= -->
+
+  <div
+    id="mobile-dashboard"
+    class="mobile-section mobile-section-active">
+
+    <!-- DASHBOARD TOP -->
+    <div class="dashboard-top">
+
+  <div class="dashboard-title">
+    <p id="householdGreeting">
+      Household WattWise Dashboard
+    </p>
+  </div>
+
+  <div class="month-selector">
+
+    <label for="selectedMonth">
+      Month
+    </label>
+
+    <select
+      id="selectedMonth"
+      onchange="refreshDashboard()">
+    </select>
+
+  </div>
 
 </div>
 
 
-      <!-- ===============================================
-           ACTUAL VS ESTIMATED
-           =============================================== -->
+    <!-- SUMMARY CARDS -->
+    <div class="summary-grid">
 
-      <div
-        id="actualBillCard"
-        class="comparison-card">
+      <div class="summary-card">
 
-        <div>
+        <div class="summary-icon">
+          💰
+        </div>
 
-          <div class="comparison-title">
-            Estimated vs Actual Bill
-          </div>
-
-          <div
-            id="actualBillMessage"
-            class="comparison-message">
-
-            Enter your actual electricity bill
-            to compare it with the estimate.
-
-          </div>
-
+        <div class="summary-label">
+          Estimated Monthly Bill
         </div>
 
         <div
-          id="actualBillAmount"
-          class="comparison-value">
+          id="totalCost"
+          class="summary-value">
+          ₱0.00
+        </div>
 
+        <div
+          id="costChange"
+          class="summary-change">
           —
-
         </div>
 
       </div>
 
 
-      <!-- ===============================================
-           MAIN DASHBOARD GRID
-           =============================================== -->
+      <div class="summary-card">
 
-      <div class="dashboard-grid">
-
-
-        <!-- =============================================
-             APPLIANCE RANKING
-             ============================================= -->
-
-        <div class="dashboard-card">
-
-          <div class="card-header">
-
-            <div>
-
-              <h2>
-                🔥 Biggest Electricity Consumers
-              </h2>
-
-              <p>
-                Which appliances cost you the most?
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <div
-            id="applianceRanking"
-            class="ranking-list">
-
-            <div class="loading">
-              Loading...
-            </div>
-
-          </div>
-
+        <div class="summary-icon">
+          ⚡
         </div>
 
+        <div class="summary-label">
+          Estimated Consumption
+        </div>
 
-        <!-- =============================================
-             CATEGORY BREAKDOWN
-             ============================================= -->
+        <div
+          id="totalKwh"
+          class="summary-value">
+          0 kWh
+        </div>
 
-        <div class="dashboard-card">
-
-          <div class="card-header">
-
-            <div>
-
-              <h2>
-                📊 By Category
-              </h2>
-
-              <p>
-                Where your electricity is going.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <div
-            id="categoryBreakdown"
-            class="category-list">
-
-            <div class="loading">
-              Loading...
-            </div>
-
-          </div>
-
+        <div
+          id="kwhChange"
+          class="summary-change">
+          —
         </div>
 
       </div>
 
 
-      <!-- ===============================================
-           APPLIANCE TABLE
-           =============================================== -->
+      <div class="summary-card">
 
-      <div class="dashboard-card full-card">
-
-        <div class="card-header">
-
-          <div>
-
-            <h2>
-              🔌 My Appliances
-            </h2>
-
-            <p>
-              Manage the appliances in your home.
-            </p>
-
-          </div>
-
-
-          <button
-            class="primary-button small-button"
-            onclick="openAddApplianceModal()">
-
-            + Add Appliance
-
-          </button>
-
+        <div class="summary-icon">
+          🔌
         </div>
 
+        <div class="summary-label">
+          Electricity Rate
+        </div>
 
-        <div class="table-wrapper">
+        <div
+          id="electricityRate"
+          class="summary-value">
+          ₱0.00
+        </div>
 
-          <table>
-
-            <thead>
-
-              <tr>
-
-                <th>
-                  Appliance
-                </th>
-
-                <th>
-                  Category
-                </th>
-
-                <th>
-                  Power
-                </th>
-
-                <th>
-                  Usage
-                </th>
-
-                <th>
-                  Monthly kWh
-                </th>
-
-                <th>
-                  Est. Cost
-                </th>
-
-                <th>
-                  %
-                </th>
-
-                <th>
-                  Actions
-                </th>
-
-              </tr>
-
-            </thead>
-
-
-            <tbody
-              id="applianceTableBody">
-
-              <tr>
-
-                <td
-                  colspan="8"
-                  class="empty-state">
-
-                  No appliances added yet.
-
-                </td>
-
-              </tr>
-
-            </tbody>
-
-          </table>
-
+        <div class="summary-small">
+          per kWh
         </div>
 
       </div>
 
 
-      <!-- ===============================================
-           TIPS
-           =============================================== -->
+      <div class="summary-card">
 
-      <div class="tips-card">
-
-        <div class="tips-icon">
-          💡
+        <div class="summary-icon">
+          🏆
         </div>
+
+        <div class="summary-label">
+          Highest Consumer
+        </div>
+
+        <div
+          id="highestConsumer"
+          class="summary-value summary-text">
+          —
+        </div>
+
+        <div
+          id="highestConsumerCost"
+          class="summary-small">
+          —
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ALERT -->
+    <div
+      id="alertContainer"
+      class="alert-container hidden">
+    </div>
+
+
+    <!-- QUICK ACTIONS -->
+    <div class="quick-actions">
+
+      <button
+        class="primary-button"
+        onclick="openAddApplianceModal()">
+        + Add Appliance
+      </button>
+
+      <button
+        class="secondary-button"
+        onclick="openRateModal()">
+        ₱ Electricity Rate
+      </button>
+
+      <button
+        class="secondary-button"
+        onclick="openActualBillModal()">
+        🧾 Enter Actual Bill
+      </button>
+
+      <button
+        class="secondary-button"
+        onclick="viewBill()">
+        📄 View Bill Histories
+      </button>
+
+    </div>
+
+
+    <!-- ACTUAL VS ESTIMATED -->
+    <div
+      id="actualBillCard"
+      class="comparison-card">
+
+      <div>
+
+        <div class="comparison-title">
+          Estimated vs Actual Bill
+        </div>
+
+        <div
+          id="actualBillMessage"
+          class="comparison-message">
+          Enter your actual electricity bill
+          to compare it with the estimate.
+        </div>
+
+      </div>
+
+      <div
+        id="actualBillAmount"
+        class="comparison-value">
+        —
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       RANKING
+       ================================================= -->
+
+  <div
+    id="mobile-ranking"
+    class="mobile-section">
+
+    <div class="dashboard-card">
+
+      <div class="card-header">
 
         <div>
 
-          <h3>
-            Electricity-saving tip
-          </h3>
+          <h2>
+            🔥 Biggest Electricity Consumers
+          </h2>
 
-          <p id="energyTip">
-
-            Add your appliances to see which ones
-            are using the most electricity.
-
+          <p>
+            Which appliances cost you the most?
           </p>
 
         </div>
 
       </div>
 
+      <div
+        id="applianceRanking"
+        class="ranking-list">
 
-    </section>
+        <div class="loading">
+          Loading...
+        </div>
 
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       CATEGORIES
+       ================================================= -->
+
+  <div
+    id="mobile-categories"
+    class="mobile-section">
+
+    <div class="dashboard-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <h2>
+            📊 By Category
+          </h2>
+
+          <p>
+            Where your electricity is going.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div
+        id="categoryBreakdown"
+        class="category-list">
+
+        <div class="loading">
+          Loading...
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       APPLIANCES
+       ================================================= -->
+
+  <div
+    id="mobile-appliances"
+    class="mobile-section">
+
+    <div class="dashboard-card full-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <h2>
+            🔌 My Appliances
+          </h2>
+
+          <p>
+            Manage the appliances in your home.
+          </p>
+
+        </div>
+
+        <button
+          class="primary-button small-button"
+          onclick="openAddApplianceModal()">
+          + Add Appliance
+        </button>
+
+      </div>
+
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Appliance</th>
+              <th>Category</th>
+              <th>Power</th>
+              <th>Usage</th>
+              <th>Monthly kWh</th>
+              <th>Est. Cost</th>
+              <th>%</th>
+              <th>Actions</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="applianceTableBody">
+
+            <tr>
+
+              <td
+                colspan="8"
+                class="empty-state">
+
+                No appliances added yet.
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+    <!-- TIPS -->
+    <div class="tips-card">
+
+      <div class="tips-icon">
+        💡
+      </div>
+
+      <div>
+
+        <h3>
+          Electricity-saving tip
+        </h3>
+
+        <p id="energyTip">
+          Add your appliances to see which ones
+          are using the most electricity.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       MOBILE BOTTOM NAVIGATION
+       ================================================= -->
+
+  <nav class="mobile-bottom-nav">
+
+    <button
+      type="button"
+      class="mobile-nav-item active"
+      onclick="showMobileSection('dashboard', this)">
+
+      <span class="mobile-nav-icon">
+        🏠
+      </span>
+
+      <span>
+        Dashboard
+      </span>
+
+    </button>
+
+
+    <button
+      type="button"
+      class="mobile-nav-item"
+      onclick="showMobileSection('ranking', this)">
+
+      <span class="mobile-nav-icon">
+        🔥
+      </span>
+
+      <span>
+        Ranking
+      </span>
+
+    </button>
+
+
+    <button
+      type="button"
+      class="mobile-nav-item"
+      onclick="showMobileSection('categories', this)">
+
+      <span class="mobile-nav-icon">
+        📊
+      </span>
+
+      <span>
+        Categories
+      </span>
+
+    </button>
+
+
+    <button
+      type="button"
+      class="mobile-nav-item"
+      onclick="showMobileSection('appliances', this)">
+
+      <span class="mobile-nav-icon">
+        🔌
+      </span>
+
+      <span>
+        Appliances
+      </span>
+
+    </button>
+
+  </nav>
+
+</section>
 
   </main>
 
