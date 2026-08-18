@@ -525,7 +525,7 @@ function showDashboard() {
 
 
   document.getElementById('householdGreeting').textContent =
-  APP.householdName + 'WattWise Dashboard';
+  'WattWise Dashboard';
 
 
 }
