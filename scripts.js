@@ -297,6 +297,8 @@ function startTracker() {
             result
           );
 
+          hideLoading();
+
           const errorBox =
             document.getElementById(
               "loginError"
