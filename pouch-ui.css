@@ -1,115 +1,290 @@
+
 /* ===================================
-   WATTWISE - POUCH STYLE UI
-   Pastel cards + soft dashboard
+   WATTWISE COZY STATIONERY THEME
+   Personal notebook style
 =================================== */
 
 :root {
-  --ww-bg: #f8faf6;
-  --ww-card: #ffffff;
-  --ww-green: #4caf68;
-  --ww-green-soft: #e9f8ed;
-  --ww-yellow-soft: #fff7dc;
-  --ww-blue-soft: #edf7ff;
-  --ww-purple-soft: #f5efff;
-  --ww-text: #1f2937;
-  --ww-muted: #6b7280;
-  --ww-radius: 22px;
+
+  --ww-paper:#fffdf8;
+  --ww-cream:#fff8ef;
+  --ww-sage:#dff3df;
+  --ww-mint:#eafaf1;
+  --ww-peach:#fff0e8;
+  --ww-lavender:#f3edff;
+  --ww-ink:#374151;
+
 }
 
+
+/* Paper background */
+
 body {
-  background: var(--ww-bg) !important;
-  color: var(--ww-text);
+
+  background:
+    linear-gradient(
+      135deg,
+      #faf8f2,
+      #f6fbf5
+    ) !important;
+
+  color:var(--ww-ink);
+
 }
+
+
+/* Dashboard title */
+
+h1 {
+
+  color:#166534 !important;
+  font-size:34px !important;
+  font-weight:800 !important;
+
+}
+
+h1::after {
+
+  content:" ✨";
+
+}
+
+
+/* Notebook cards */
 
 .card,
 .dashboard-card,
 .summary-card,
 .stat-card {
-  background: var(--ww-card) !important;
-  border-radius: var(--ww-radius) !important;
-  border: none !important;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.05) !important;
-  padding:20px !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      var(--ww-paper)
+    ) !important;
+
+  border-radius:26px !important;
+
+  border:none !important;
+
+  box-shadow:
+
+    0 12px 30px rgba(34,70,40,.08),
+    inset 0 0 0 1px rgba(255,255,255,.8)
+    !important;
+
+  transition:.25s ease;
+
 }
 
-.dashboard-container,
-.dashboard {
-  gap:18px !important;
+
+.card:hover,
+.dashboard-card:hover,
+.summary-card:hover {
+
+  transform:translateY(-4px);
+
+  box-shadow:
+
+    0 18px 35px rgba(34,70,40,.12)
+    !important;
+
 }
 
-h1,
-h2,
-h3 {
-  font-weight:700 !important;
-  letter-spacing:-0.02em;
+
+/* Pastel summary cards */
+
+.summary-card:nth-child(1){
+
+ background:
+ linear-gradient(
+ 135deg,
+ #e9f8ed,
+ #f7fff8
+ ) !important;
+
 }
+
+
+.summary-card:nth-child(2){
+
+ background:
+ linear-gradient(
+ 135deg,
+ #edf7ff,
+ #ffffff
+ ) !important;
+
+}
+
+
+.summary-card:nth-child(3){
+
+ background:
+ linear-gradient(
+ 135deg,
+ #fff7dc,
+ #fffdf5
+ ) !important;
+
+}
+
+
+.summary-card:nth-child(4){
+
+ background:
+ linear-gradient(
+ 135deg,
+ #f5efff,
+ #ffffff
+ ) !important;
+
+}
+
+
+/* Sticker buttons */
 
 button,
 .btn {
-  border-radius:16px !important;
-  border:none !important;
-  font-weight:600 !important;
-  padding:12px 20px !important;
+
+ background:#ffffff !important;
+
+ border-radius:18px !important;
+
+ border:1px solid #edf0ea !important;
+
+ box-shadow:
+ 0 5px 12px rgba(0,0,0,.05);
+
+ font-weight:600;
+
 }
+
 
 button:hover,
 .btn:hover {
-  transform:translateY(-2px);
+
+ background:#f1faef !important;
+
+ transform:translateY(-2px);
+
 }
+
+
+/* Main green button */
 
 .btn-primary,
 button.primary {
-  background:var(--ww-green) !important;
-  color:white !important;
+
+ background:
+ linear-gradient(
+ 135deg,
+ #62d66f,
+ #45b85b
+ ) !important;
+
+ color:white !important;
+
+ box-shadow:
+
+ 0 8px 20px rgba(76,175,104,.25)
+ !important;
+
 }
+
+
+/* Notebook inputs */
 
 input,
 select,
 textarea {
-  border-radius:14px !important;
-  border:1px solid #e5e7eb !important;
-  padding:12px !important;
-  background:white !important;
+
+ background:#fffefb !important;
+
+ border:
+
+ 1px solid #e9e2d7 !important;
+
+ border-radius:16px !important;
+
+ box-shadow:
+
+ inset 0 2px 5px rgba(0,0,0,.03);
+
 }
 
-.summary-card:nth-child(1) {
-  background:var(--ww-green-soft) !important;
+
+/* Section titles */
+
+.card h2,
+.dashboard-card h2 {
+
+ color:#14532d !important;
+
 }
 
-.summary-card:nth-child(2) {
-  background:var(--ww-blue-soft) !important;
-}
 
-.summary-card:nth-child(3) {
-  background:var(--ww-yellow-soft) !important;
-}
-
-.summary-card:nth-child(4) {
-  background:var(--ww-purple-soft) !important;
-}
+/* Tables */
 
 table {
-  border-radius:18px;
-  overflow:hidden;
+
+ background:white;
+
+ border-radius:20px !important;
+
+ overflow:hidden;
+
 }
 
+
 thead {
-  background:#f3f8f3 !important;
+
+ background:#edf7ee !important;
+
+ color:#166534;
+
 }
+
 
 td,
 th {
-  padding:14px !important;
+
+ padding:14px !important;
+
 }
+
+
+/* Empty/loading text */
+
+.loading,
+.empty-state {
+
+ color:#7c8a7d;
+
+ font-style:italic;
+
+}
+
+
+/* Mobile */
 
 @media(max-width:768px){
 
-  .card,
-  .dashboard-card,
-  .summary-card,
-  .stat-card {
-    padding:16px !important;
-    border-radius:18px !important;
-  }
+ h1 {
+
+  font-size:26px !important;
+
+ }
+
+
+ .card,
+ .dashboard-card,
+ .summary-card {
+
+  border-radius:22px !important;
+
+ }
 
 }
+
