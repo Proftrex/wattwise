@@ -311,7 +311,7 @@ function startTracker() {
               result &&
               result.message
                 ? result.message
-                : "Email or password is incorrect.";
+                : "Email and Password do not match. Please make sure you have the correct login details.";
 
 
             errorBox.classList.add(
