@@ -363,3 +363,13 @@ font-size:28px!important;
   margin-right: 8px;
 }
 
+
+.primary-button .action-icon,
+.secondary-button .action-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
