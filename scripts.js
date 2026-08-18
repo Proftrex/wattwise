@@ -222,10 +222,10 @@ function startTracker() {
       .trim()
       .toLowerCase();
 
-  const householdName =
+  const password =
     document
       .getElementById(
-        'householdName'
+        'userPassword'
       )
       .value
       .trim();
@@ -235,6 +235,16 @@ function startTracker() {
 
     showToast(
       'Please enter your email.'
+    );
+
+    return;
+  }
+
+
+  if (!password) {
+
+    showToast(
+      'Please enter your password.'
     );
 
     return;
@@ -254,9 +264,8 @@ function startTracker() {
   APP.email =
     email;
 
-  APP.householdName =
-    householdName ||
-    'My Household';
+  APP.password =
+    password;
 
 
   console.log(
@@ -266,11 +275,14 @@ function startTracker() {
 
 
   showLoading(
-    'Loading your household...'
+    'Loading your WattWise dashboard...'
   );
 
 
-  getUserIdByEmail(email)
+  getUserIdByLogin(
+    email,
+    password
+  )
 
     .then(function(result) {
 

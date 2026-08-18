@@ -60,6 +60,19 @@ async function getUserIdByEmail(email) {
 }
 
 
+async function getUserIdByLogin(email, password) {
+
+  return await apiCall(
+    "getUserIdByLogin",
+    {
+      email: email,
+      password: password
+    }
+  );
+
+}
+
+
 // DASHBOARD
 
 async function getDashboard(userId, month) {
