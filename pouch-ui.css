@@ -354,3 +354,12 @@ font-size:28px!important;
   object-fit: contain;
 }
 
+
+.action-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
