@@ -35,19 +35,187 @@ const DEFAULT_ALERT_COST = 1000;
 /**
  * Web App entry point.
  */
-function doGet() {
-  return HtmlService
-    .createTemplateFromFile('index')
-    .evaluate()
-    .setTitle(APP_NAME)
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+function doGet(e) {
+
+  try {
+
+    const action =
+      e.parameter.action;
+
+
+    let result;
+
+
+    switch(action) {
+
+
+      case "getUserIdByEmail":
+
+        result =
+          getUserIdByEmail(
+            e.parameter.email
+          );
+
+        break;
+
+
+      case "getUserSpreadsheet":
+
+        result =
+          getUserSpreadsheet(
+            e.parameter.userId
+          );
+
+        break;
+
+
+      case "getDashboard":
+
+        result =
+          getDashboard(
+            e.parameter.userId,
+            e.parameter.month
+          );
+
+        break;
+
+
+      case "getAppliances":
+
+        result =
+          getAppliances(
+            e.parameter.userId
+          );
+
+        break;
+
+
+      case "addAppliance":
+
+        result =
+          addAppliance(
+            JSON.parse(
+              e.parameter.data
+            )
+          );
+
+        break;
+
+
+      case "updateAppliance":
+
+        result =
+          updateAppliance(
+            JSON.parse(
+              e.parameter.data
+            )
+          );
+
+        break;
+
+
+      case "deleteAppliance":
+
+        result =
+          deleteAppliance(
+            e.parameter.applianceId,
+            e.parameter.userId
+          );
+
+        break;
+
+
+      case "addElectricityRate":
+
+        result =
+          addElectricityRate(
+            JSON.parse(
+              e.parameter.data
+            )
+          );
+
+        break;
+
+
+      case "saveActualBillDirect":
+
+        result =
+          saveActualBillDirect(
+            JSON.parse(
+              e.parameter.data
+            )
+          );
+
+        break;
+
+
+      case "getActualBills":
+
+        result =
+          getActualBills(
+            e.parameter.userId
+          );
+
+        break;
+
+
+      case "updateSavedBill":
+
+        result =
+          updateSavedBill(
+            e.parameter.userId,
+            e.parameter.billId,
+            JSON.parse(
+              e.parameter.data
+            )
+          );
+
+        break;
+
+
+      default:
+
+        result = {
+          success:false,
+          message:"Unknown action"
+        };
+
+    }
+
+
+    return ContentService
+      .createTextOutput(
+        JSON.stringify(result)
+      )
+      .setMimeType(
+        ContentService.MimeType.JSON
+      );
+
+
+  } catch(error) {
+
+
+    return ContentService
+      .createTextOutput(
+        JSON.stringify({
+          success:false,
+          message:error.message
+        })
+      )
+      .setMimeType(
+        ContentService.MimeType.JSON
+      );
+
+
+  }
+
 }
 
 /**
  * Allows HTML files to include other HTML files.
  *
  * Example:
- * <?!= include('scripts'); ?>
+ * Example: include static frontend files through index.html
  */
 function include(filename) {
   return HtmlService

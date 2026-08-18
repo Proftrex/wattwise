@@ -1,4 +1,4 @@
-<script>
+
 
 /* =====================================================
    GLOBAL STATE
@@ -270,10 +270,9 @@ function startTracker() {
   );
 
 
-  google.script.run
+  getUserIdByEmail(email)
 
-    .withSuccessHandler(
-      function(result) {
+    .then(function(result) {
 
 
         if (
@@ -334,10 +333,9 @@ if (
   );
 
 
-  google.script.run
+  getUserSpreadsheet(APP.userId)
 
-  .withSuccessHandler(
-    function(sheetResult){
+    .then(function(sheetResult){
 
       console.log(
         "Spreadsheet created:",
@@ -377,24 +375,22 @@ if (
       continueLoadingApp();
 
       console.log(
-  "Continuing app after spreadsheet creation"
-);
+        "Continuing app after spreadsheet creation"
+      );
 
-console.log(
-  "Current APP.userId:",
-  APP.userId
-);
+      console.log(
+        "Current APP.userId:",
+        APP.userId
+      );
 
-console.log(
-  "Current APP.email:",
-  APP.email
-);
+      console.log(
+        "Current APP.email:",
+        APP.email
+      );
 
-    }
-  )
+    })
 
-  .withFailureHandler(
-    function(error){
+  .catch(function(error){
 
       console.error(
         error
@@ -406,12 +402,7 @@ console.log(
         getErrorMessage(error)
       );
 
-    }
-  )
-
-  .getUserSpreadsheet(
-    APP.userId
-  );
+    });
 
 
   return;
@@ -487,11 +478,9 @@ console.log(
 
 }
 
-      }
-    )
+      })
 
-    .withFailureHandler(
-      function(error) {
+      .catch(function(error) {
 
         hideLoading();
 
@@ -504,12 +493,7 @@ console.log(
           getErrorMessage(error)
         );
 
-      }
-    )
-
-    .getUserIdByEmail(
-      email
-    );
+      });
 
 }
 
@@ -571,9 +555,12 @@ function refreshDashboard() {
    * Don't block the entire application
    * while dashboard data loads.
    */
-  google.script.run
+  getDashboard(
+    APP.userId,
+    month
+  )
 
-    .withSuccessHandler(function(result) {
+    .then(function(result) {
 
       console.log(
         'Dashboard data received:',
@@ -603,7 +590,7 @@ function refreshDashboard() {
 
     })
 
-    .withFailureHandler(function(error) {
+    .catch(function(error) {
 
       console.error(
         'Dashboard loading failed:',
@@ -614,12 +601,7 @@ function refreshDashboard() {
         getErrorMessage(error)
       );
 
-    })
-
-    .getDashboard(
-      APP.userId,
-      month
-    );
+    });
 
 }
 
@@ -1417,10 +1399,9 @@ function loadAppliances() {
   }
 
 
-  google.script.run
+  getAppliances(APP.userId)
 
-    .withSuccessHandler(
-      function(result) {
+    .then(function(result) {
 
         if (
           !result ||
@@ -1440,22 +1421,15 @@ function loadAppliances() {
           APP.appliances
         );
 
-      }
-    )
+    })
 
-    .withFailureHandler(
-      function(error) {
+    .catch(function(error) {
 
         console.error(
           error
         );
 
-      }
-    )
-
-    .getAppliances(
-      APP.userId
-    );
+      });
 
 }
 
@@ -2221,17 +2195,18 @@ console.log('APP.userId = ' + APP.userId);
   );
 
 
-  const functionName =
-    data.applianceId
-      ? 'updateAppliance'
-      : 'addAppliance';
+  let request;
+
+  if (data.applianceId) {
+    request = updateAppliance(data);
+  } else {
+    request = addAppliance(data);
+  }
 
 
-  const runner =
-    google.script.run
+  request
 
-      .withSuccessHandler(
-        function(result) {
+      .then(function(result) {
 
           hideLoading();
 
@@ -2266,11 +2241,9 @@ console.log('APP.userId = ' + APP.userId);
 
           refreshDashboard();
 
-        }
-      )
+      })
 
-      .withFailureHandler(
-        function(error) {
+      .catch(function(error) {
 
           hideLoading();
 
@@ -2282,25 +2255,7 @@ console.log('APP.userId = ' + APP.userId);
             )
           );
 
-        }
-      );
-
-
-  if (
-    data.applianceId
-  ) {
-
-    runner.updateAppliance(
-      data
-    );
-
-  } else {
-
-    runner.addAppliance(
-      data
-    );
-
-  }
+      });
 
 }
 
@@ -2350,10 +2305,12 @@ function deleteAppliance(
   );
 
 
-  google.script.run
+  deleteAppliance(
+    applianceId,
+    APP.userId
+  )
 
-    .withSuccessHandler(
-      function(result) {
+    .then(function(result) {
 
         hideLoading();
 
@@ -2382,11 +2339,9 @@ function deleteAppliance(
 
         refreshDashboard();
 
-      }
-    )
+      })
 
-    .withFailureHandler(
-      function(error) {
+    .catch(function(error) {
 
         hideLoading();
 
@@ -2396,13 +2351,7 @@ function deleteAppliance(
           )
         );
 
-      }
-    )
-
-    .deleteAppliance(
-      applianceId,
-      APP.userId
-    );
+      });
 
 }
 
@@ -2782,10 +2731,9 @@ function saveRate(
   );
 
 
-  google.script.run
+  addElectricityRate(data)
 
-    .withSuccessHandler(
-      function(result) {
+    .then(function(result) {
 
         hideLoading();
 
@@ -2818,11 +2766,9 @@ function saveRate(
 
         refreshDashboard();
 
-      }
-    )
+      })
 
-    .withFailureHandler(
-      function(error) {
+    .catch(function(error) {
 
         hideLoading();
 
@@ -2834,12 +2780,7 @@ function saveRate(
           )
         );
 
-      }
-    )
-
-    .addElectricityRate(
-      data
-    );
+      });
 
 }
 
@@ -2978,11 +2919,9 @@ function openBillModal(){
 
 
 
-    google.script.run
+    getUserIdByEmail(savedEmail)
 
-
-      .withSuccessHandler(
-        function(result){
+      .then(function(result){
 
 
           console.log(
@@ -3026,12 +2965,10 @@ function openBillModal(){
 
 
 
-        }
-      )
+        })
 
 
-      .withFailureHandler(
-        function(error){
+      .catch(function(error){
 
 
           console.error(
@@ -3039,13 +2976,7 @@ function openBillModal(){
           );
 
 
-        }
-      )
-
-
-      .getUserIdByEmail(
-        savedEmail
-      );
+        });
 
 
 
@@ -3248,10 +3179,9 @@ if(loadingOverlay){
 
 }
 
-  google.script.run
+  saveActualBillDirect(data)
 
-    .withSuccessHandler(
-      function(response) {
+    .then(function(response) {
 
 
         console.log(
@@ -3288,12 +3218,10 @@ if(loadingOverlay){
         );
 
 
-      }
-    )
+      })
 
 
-    .withFailureHandler(
-      function(error) {
+    .catch(function(error) {
 
 
         console.error(
@@ -3307,13 +3235,7 @@ if(loadingOverlay){
         );
 
 
-      }
-    )
-
-
-    .saveActualBillDirect(
-      data
-    );
+      });
 
 }
 
@@ -4219,9 +4141,9 @@ function loadActualBills(){
   );
 
 
-  google.script.run
+  getActualBills(APP.userId)
 
-    .withSuccessHandler(function(bills){
+    .then(function(bills){
 
 
       console.log(
@@ -4299,7 +4221,7 @@ function loadActualBills(){
     })
 
 
-    .withFailureHandler(function(error){
+    .catch(function(error){
 
 
       console.error(
@@ -4326,12 +4248,7 @@ function loadActualBills(){
       );
 
 
-    })
-
-
-    .getActualBills(
-      APP.userId
-    );
+    });
 
 }
 
@@ -4589,10 +4506,13 @@ if(loadingOverlay){
     data
   );
 
-  google.script.run
+  updateSavedBill(
+    APP.userId,
+    bill.billId,
+    data
+  )
 
-    .withSuccessHandler(
-      function(result){
+    .then(function(result){
 
         if(loadingOverlay){
 
@@ -4710,11 +4630,9 @@ if(loadingOverlay){
           "Bill updated successfully."
         );
 
-      }
-    )
+      })
 
-    .withFailureHandler(
-      function(error){
+    .catch(function(error){
 
         if(loadingOverlay){
 
@@ -4737,14 +4655,7 @@ if(loadingOverlay){
           )
         );
 
-      }
-    )
-
-    .updateSavedBill(
-      APP.userId,
-      bill.billId,
-      data
-    );
+      });
 
 
 }
@@ -5104,4 +5015,4 @@ console.log(
 
 }
 
-</script>
+
