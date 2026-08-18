@@ -297,12 +297,27 @@ function startTracker() {
             result
           );
 
-          showToast(
-            result &&
-            result.message
-              ? result.message
-              : 'User account not found.'
-          );
+          const errorBox =
+            document.getElementById(
+              "loginError"
+            );
+
+
+          if (errorBox) {
+
+            errorBox.innerText =
+              result &&
+              result.message
+                ? result.message
+                : "Email or password is incorrect.";
+
+
+            errorBox.classList.add(
+              "show"
+            );
+
+          }
+
 
           return;
         }

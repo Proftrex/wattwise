@@ -221,6 +221,160 @@ function getUserById(userId) {
 
 
 
+
+
+/**
+ * Hash password using SHA-256
+ * Stores only the hash, never the password.
+ */
+function hashPassword(password) {
+
+  const raw =
+    toSafeString(password);
+
+  if (!raw) {
+    return '';
+  }
+
+
+  const bytes =
+    Utilities.computeDigest(
+      Utilities.DigestAlgorithm.SHA_256,
+      raw,
+      Utilities.Charset.UTF_8
+    );
+
+
+  return bytes
+    .map(function(byte){
+
+      return (
+        ('0' + (byte & 0xFF).toString(16))
+        .slice(-2)
+      );
+
+    })
+    .join('');
+
+}
+
+
+
+
+function getUserIdByLogin(email, password) {
+
+  try {
+
+    const targetEmail =
+      toSafeString(email).toLowerCase();
+
+
+    const passwordHash =
+      hashPassword(password);
+
+
+    const users =
+      getSheetRecords(
+        SHEETS.USERS
+      );
+
+
+    for (
+      let i = 0;
+      i < users.length;
+      i++
+    ) {
+
+
+      const currentEmail =
+        toSafeString(
+          users[i]['Email']
+        ).toLowerCase();
+
+
+      const storedHash =
+        toSafeString(
+          users[i]['Password Hash']
+        );
+
+
+      if (
+        currentEmail === targetEmail &&
+        storedHash === passwordHash
+      ) {
+
+
+        return {
+
+          success:true,
+
+          userId:
+            toSafeString(
+              users[i]['User ID']
+            ),
+
+          email:
+            currentEmail,
+
+          name:
+            toSafeString(
+              users[i]['Name']
+            ),
+
+          householdName:
+            toSafeString(
+              users[i]['Household Name']
+            ),
+
+          accessStatus:
+            toSafeString(
+              users[i]['Access Status']
+            ),
+
+          spreadsheetId:
+            toSafeString(
+              users[i]['Spreadsheet ID']
+            ),
+
+          spreadsheetUrl:
+            toSafeString(
+              users[i]['Spreadsheet URL']
+            )
+
+        };
+
+      }
+
+    }
+
+
+    return {
+
+      success:false,
+
+      message:
+        'Invalid email or password.'
+
+    };
+
+
+  } catch(error) {
+
+
+    return {
+
+      success:false,
+
+      message:
+        error.message
+
+    };
+
+  }
+
+}
+
+
 function getUserIdByEmail(email) {
 
 try {
@@ -599,6 +753,7 @@ function setupDedicatedSpreadsheet_(
     [
       'User ID',
       'Email',
+      'Password Hash',
       'Name',
       'Household Name',
       'Created At',
@@ -2776,3 +2931,92 @@ function getUserSpreadsheetId(userId) {
 
   return "";
 }
+
+
+/**
+ * One-time password setup
+ * Run manually from Apps Script editor.
+ */
+function setUserPassword(email, password) {
+
+  const sheet =
+    SpreadsheetApp
+      .getActive()
+      .getSheetByName(
+        SHEETS.USERS
+      );
+
+
+  const data =
+    sheet
+      .getDataRange()
+      .getValues();
+
+
+  const headers =
+    data[0];
+
+
+  const emailCol =
+    headers.indexOf("Email");
+
+
+  const passwordCol =
+    headers.indexOf("Password Hash");
+
+
+  if (
+    passwordCol === -1
+  ) {
+
+    throw new Error(
+      "Password Hash column not found."
+    );
+
+  }
+
+
+  for (
+    let i = 1;
+    i < data.length;
+    i++
+  ) {
+
+
+    if (
+      String(data[i][emailCol])
+        .toLowerCase()
+        ===
+      email.toLowerCase()
+    ) {
+
+
+      sheet
+        .getRange(
+          i + 1,
+          passwordCol + 1
+        )
+        .setValue(
+          hashPassword(password)
+        );
+
+
+      return {
+        success:true,
+        message:
+          "Password updated."
+      };
+
+    }
+
+  }
+
+
+  return {
+    success:false,
+    message:
+      "Email not found."
+  };
+
+}
+

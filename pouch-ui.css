@@ -373,3 +373,646 @@ font-size:28px!important;
   margin-right: 6px;
 }
 
+
+
+/* ===============================
+   WATTWISE LOGIN NOTEBOOK STYLE
+================================ */
+
+.login-box,
+.login-card {
+
+  background:#fffdf5 !important;
+
+  border-radius:28px !important;
+
+  border:2px solid #e5f0d8 !important;
+
+  box-shadow:
+  0 15px 35px rgba(100,80,40,.10) !important;
+
+}
+
+
+.login-logo {
+
+  width:72px;
+  height:72px;
+
+  object-fit:contain;
+
+  background:#e9f7df;
+
+  padding:12px;
+
+  border-radius:22px;
+
+}
+
+
+/* chocolate brown text */
+
+.login-box h1,
+.login-box h2,
+.login-box label {
+
+  color:#6b4630 !important;
+
+}
+
+
+/* softer inputs */
+
+.login-box input {
+
+  background:#fffaf0 !important;
+
+  border:2px solid #f0dfb8 !important;
+
+  color:#6b4630 !important;
+
+}
+
+
+/* notebook button */
+
+.login-box button {
+
+  background:#e8f3d8 !important;
+
+  color:#6b4630 !important;
+
+  border:2px solid #cde3b8 !important;
+
+}
+
+
+.login-box button:hover {
+
+  background:#ffe6a8 !important;
+
+}
+
+
+
+
+/* ===============================
+   LOGIN BOX PASTEL GREEN THEME
+================================ */
+
+
+.login-box,
+.login-card {
+
+  background:#f1faed !important;
+
+  border:2px solid #d4ebc8 !important;
+
+  box-shadow:
+  0 15px 35px rgba(80,120,70,.12) !important;
+
+}
+
+
+
+/* login title */
+
+.login-box h1,
+.login-box h2 {
+
+  color:#6b4630 !important;
+
+}
+
+
+
+/* labels */
+
+.login-box label {
+
+  color:#6b4630 !important;
+
+}
+
+
+
+/* inputs */
+
+.login-box input {
+
+  background:#fffef8 !important;
+
+  border:2px solid #d8e8c9 !important;
+
+}
+
+
+
+/* start button */
+
+.login-box button {
+
+  background:#dff3c8 !important;
+
+  border:2px solid #b9d99b !important;
+
+  color:#6b4630 !important;
+
+}
+
+
+.login-box button:hover {
+
+  background:#c9eaa8 !important;
+
+}
+
+
+
+
+/* ===================================
+   WATTWISE NOTEBOOK DASHBOARD
+   Pastel Green + Yellow + Orange
+=================================== */
+
+
+/* Main background */
+
+body {
+
+background:#f7faf3 !important;
+
+color:#6b4630 !important;
+
+}
+
+
+
+/* Dashboard header */
+
+.dashboard-top h1 {
+
+color:#6b4630 !important;
+
+font-size:36px !important;
+
+font-weight:800 !important;
+
+}
+
+
+
+/* Month selector */
+
+.dashboard-top .month-selector select {
+
+background:#fff8dc !important;
+
+border:2px solid #ead8a8 !important;
+
+color:#6b4630 !important;
+
+border-radius:18px !important;
+
+}
+
+
+
+/* Summary layout */
+
+.summary-grid {
+
+gap:18px !important;
+
+}
+
+
+
+/* Notebook cards */
+
+.summary-card {
+
+
+background:#eef8e8 !important;
+
+border:2px solid #d8eac8 !important;
+
+border-radius:26px !important;
+
+
+box-shadow:
+0 8px 20px rgba(100,80,40,.08) !important;
+
+
+}
+
+
+
+/* Individual sticky note colors */
+
+
+.summary-card:nth-child(1){
+
+background:#e5f4dc !important;
+
+}
+
+
+.summary-card:nth-child(2){
+
+background:#fff1b8 !important;
+
+}
+
+
+.summary-card:nth-child(3){
+
+background:#edf5dc !important;
+
+}
+
+
+.summary-card:nth-child(4){
+
+background:#ffe8c7 !important;
+
+}
+
+
+
+
+/* Text */
+
+.summary-label,
+.summary-small {
+
+color:#7a6656 !important;
+
+}
+
+
+.summary-value {
+
+color:#6b4630 !important;
+
+font-weight:800 !important;
+
+}
+
+
+
+/* Quick action buttons */
+
+
+.quick-actions button {
+
+
+background:#fff9e8 !important;
+
+
+border:2px solid #ead9b3 !important;
+
+
+border-radius:22px !important;
+
+
+color:#6b4630 !important;
+
+
+box-shadow:
+0 6px 15px rgba(80,60,30,.08) !important;
+
+
+}
+
+
+
+.quick-actions button:hover {
+
+
+background:#e9f5d9 !important;
+
+
+}
+
+
+
+
+/* Dashboard sections */
+
+.dashboard-card {
+
+
+background:#fffdf7 !important;
+
+
+border:2px solid #e7dfc8 !important;
+
+
+border-radius:28px !important;
+
+
+box-shadow:
+0 10px 25px rgba(70,50,20,.08) !important;
+
+
+}
+
+
+
+/* headings */
+
+
+.dashboard-card h2 {
+
+color:#6b4630 !important;
+
+}
+
+
+
+
+
+/* ===================================
+   WATTWISE CUTE NOTEBOOK FONT
+=================================== */
+
+
+body,
+button,
+input,
+select,
+textarea {
+
+  font-family:
+    "Nunito",
+    "Comic Sans MS",
+    system-ui,
+    sans-serif !important;
+
+}
+
+
+/* softer headings */
+
+h1,
+h2,
+h3,
+.dashboard-title,
+.summary-value {
+
+  font-family:
+    "Nunito",
+    sans-serif !important;
+
+  letter-spacing:-0.03em !important;
+
+}
+
+
+/* cute rounded buttons */
+
+button,
+.btn {
+
+  font-weight:700 !important;
+
+}
+
+
+
+
+/* ===================================
+   WATTWISE LOGIN PASTEL THEME
+   Green box + Yellow button
+=================================== */
+
+
+/* Login container */
+
+.login-box,
+.login-card {
+
+  background:#e8f5df !important;
+
+  border:2px solid #cfe7bd !important;
+
+  border-radius:30px !important;
+
+  box-shadow:
+  0 12px 30px rgba(80,120,70,.15) !important;
+
+}
+
+
+
+/* Login title */
+
+.login-box h1,
+.login-box h2 {
+
+  color:#6b4630 !important;
+
+}
+
+
+
+/* Input fields */
+
+.login-box input {
+
+  background:#fffdf5 !important;
+
+  border:2px solid #d8e8c9 !important;
+
+  color:#6b4630 !important;
+
+}
+
+
+
+/* Login button pastel yellow */
+
+.login-box button,
+.login-card button {
+
+  background:#ffe8a3 !important;
+
+  color:#6b4630 !important;
+
+  border:2px solid #f2d47a !important;
+
+  border-radius:18px !important;
+
+  font-weight:800 !important;
+
+  box-shadow:
+  0 6px 14px rgba(220,180,70,.25) !important;
+
+}
+
+
+
+.login-box button:hover,
+.login-card button:hover {
+
+  background:#ffdd78 !important;
+
+}
+
+
+
+
+/* ===================================
+   WATTWISE SETUP CARD
+   Pastel Green Notebook Style
+=================================== */
+
+
+/* Main login/setup card */
+
+.setup-card {
+
+  background:#e8f5df !important;
+
+  border:2px solid #cfe7bd !important;
+
+  border-radius:32px !important;
+
+  box-shadow:
+  0 15px 35px rgba(80,120,70,.15) !important;
+
+}
+
+
+
+/* House icon container */
+
+.setup-icon {
+
+  background:#dff3df !important;
+
+  border-radius:24px !important;
+
+}
+
+
+
+/* Logo image */
+
+.setup-icon .login-logo {
+
+  width:75px !important;
+
+  height:75px !important;
+
+  object-fit:contain;
+
+}
+
+
+
+/* Heading */
+
+.setup-card h2 {
+
+  color:#6b4630 !important;
+
+  font-family:"Nunito", sans-serif !important;
+
+}
+
+
+
+/* Description */
+
+.setup-card p {
+
+  color:#7a6656 !important;
+
+}
+
+
+
+/* Labels */
+
+.setup-card label {
+
+  color:#6b4630 !important;
+
+  font-weight:700 !important;
+
+}
+
+
+
+/* Inputs */
+
+.setup-card input {
+
+  background:#fffdf5 !important;
+
+  border:2px solid #d7e8c6 !important;
+
+  border-radius:18px !important;
+
+  color:#6b4630 !important;
+
+}
+
+
+
+/* Start Tracking button */
+
+.setup-card .primary-button {
+
+  background:#ffe8a3 !important;
+
+  border:2px solid #f1d477 !important;
+
+  color:#6b4630 !important;
+
+  border-radius:20px !important;
+
+  font-weight:800 !important;
+
+  box-shadow:
+  0 8px 15px rgba(220,180,70,.25) !important;
+
+}
+
+
+.setup-card .primary-button:hover {
+
+  background:#ffdc78 !important;
+
+}
+
+
+
+
+/* Login error message */
+
+.login-error {
+
+  margin-top: 12px;
+
+  text-align: center;
+
+  color: #8b4513;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  display: none;
+
+}
+
+
+.login-error.show {
+
+  display: block;
+
+}
+

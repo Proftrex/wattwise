@@ -69,7 +69,7 @@
       class="setup-card">
 
       <div class="setup-icon">
-        🏠
+        <img src="assets/icons/House.png" class="login-logo" alt="WattWise">
       </div>
 
       <h2>
@@ -97,13 +97,13 @@
       <div class="form-group">
 
         <label>
-          Household name
+          Password
         </label>
 
         <input
-          id="householdName"
-          type="text"
-          placeholder="e.g. Our Family Home">
+          id="userPassword"
+          type="password"
+          placeholder="Enter your password">
 
       </div>
 
@@ -115,6 +115,12 @@
         Start Tracking
 
       </button>
+
+
+      <div
+        id="loginError"
+        class="login-error">
+      </div>
 
     </section>
 
@@ -141,7 +147,7 @@
 
   <div class="dashboard-title">
     <p id="householdGreeting">
-      Household WattWise Dashboard
+      WattWise Dashboard
     </p>
   </div>
 
@@ -1934,3 +1940,6 @@
 </body>
 
 </html>
+
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
