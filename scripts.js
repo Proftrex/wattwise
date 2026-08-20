@@ -2258,17 +2258,26 @@ console.log('APP.userId = ' + APP.userId);
           }
 
 
+          hideLoading();
+
+
           closeApplianceModal();
 
 
-          showToast(
+          showLoading(
             data.applianceId
-              ? 'Appliance updated successfully.'
-              : 'Appliance added successfully.'
+              ? 'Appliance updated successfully'
+              : 'Appliance saved successfully'
           );
 
 
-          refreshDashboard();
+          setTimeout(function() {
+
+            hideLoading();
+
+            refreshDashboard();
+
+          }, 1500);
 
       })
 
@@ -2788,12 +2797,18 @@ function saveRate(
         closeRateModal();
 
 
-        showToast(
-          'Electricity rate saved successfully.'
+        showLoading(
+          'Electricity rate saved successfully'
         );
 
 
-        refreshDashboard();
+        setTimeout(function() {
+
+          hideLoading();
+
+          refreshDashboard();
+
+        }, 1500);
 
       })
 
@@ -3049,128 +3064,81 @@ function saveActualBill(event) {
 
   event.preventDefault();
 
-
   const data = {
-
 
     userId:
       APP.userId,
 
-
     billMonth:
-      document.getElementById(
-        "billMonth"
-      ).value,
-
+      document.getElementById("billMonth").value,
 
     actualBill:
       Number(
-        document.getElementById(
-          "actualBill"
-        ).value
+        document.getElementById("actualBill").value
       ),
-
 
     actualKwh:
       Number(
-        document.getElementById(
-          "actualKwh"
-        ).value
+        document.getElementById("actualKwh").value
       ),
-
 
     generation:
       Number(
-        document.getElementById(
-          "generation"
-        ).value
+        document.getElementById("generation").value
       ),
-
 
     transmission:
       Number(
-        document.getElementById(
-          "transmission"
-        ).value
+        document.getElementById("transmission").value
       ),
-
 
     systemLoss:
       Number(
-        document.getElementById(
-          "systemLoss"
-        ).value
+        document.getElementById("systemLoss").value
       ),
-
 
     distribution:
       Number(
-        document.getElementById(
-          "distribution"
-        ).value
+        document.getElementById("distribution").value
       ),
-
 
     seniorCitizen:
       Number(
-        document.getElementById(
-          "seniorCitizen"
-        ).value
+        document.getElementById("seniorCitizen").value
       ),
-
 
     governmentTaxes:
       Number(
-        document.getElementById(
-          "governmentTaxes"
-        ).value
+        document.getElementById("governmentTaxes").value
       ),
-
 
     universalCharges:
       Number(
-        document.getElementById(
-          "universalCharges"
-        ).value
+        document.getElementById("universalCharges").value
       ),
-
 
     fitAll:
       Number(
-        document.getElementById(
-          "fitAll"
-        ).value
+        document.getElementById("fitAll").value
       ),
-
 
     geaAll:
       Number(
-        document.getElementById(
-          "geaAll"
-        ).value
+        document.getElementById("geaAll").value
       ),
-
 
     lifeline:
       Number(
-        document.getElementById(
-          "lifeline"
-        ).value
+        document.getElementById("lifeline").value
       ),
-
 
     otherCharges:
       Number(
-        document.getElementById(
-          "otherCharges"
-        ).value
+        document.getElementById("otherCharges").value
       ),
 
-
     notes:
-      document.getElementById(
-        "billNotes"
-      ).value
+      document.getElementById("billNotes").value
 
   };
 
@@ -3181,93 +3149,77 @@ function saveActualBill(event) {
   );
 
 
-const loadingOverlay =
-document.querySelector(
-  ".loading-overlay"
-);
-
-const loadingText =
-document.getElementById(
-  "loadingText"
-);
-
-
-if(loadingText){
-
-  loadingText.textContent =
-    "Saving actual bill...";
-
-}
-
-
-if(loadingOverlay){
-
-  loadingOverlay.classList.remove(
-    "hidden"
+  showLoading(
+    "Saving actual bill..."
   );
 
-}
 
   saveActualBillDirect(data)
 
     .then(function(response) {
 
+      console.log(
+        "Bill saved:",
+        response
+      );
 
-        console.log(
-          "Bill saved:",
-          response
+
+      if (
+        !response ||
+        !response.success
+      ) {
+
+        hideLoading();
+
+        showToast(
+          response &&
+          response.message
+            ? response.message
+            : "Unable to save bill."
         );
 
+        return;
 
-        if(
-          !response ||
-          !response.success
-        ){
-
-          showToast(
-            response &&
-            response.message
-              ? response.message
-              : "Unable to save bill."
-          );
-
-          return;
-
-        }
+      }
 
 
-        closeActualBillModal();
+      closeActualBillModal();
 
+
+      showLoading(
+        "Actual Bill saved successfully"
+      );
+
+
+      setTimeout(function() {
+
+        hideLoading();
 
         refreshDashboard();
 
+      }, 1500);
 
-        showToast(
-          "Actual bill saved successfully!"
-        );
-
-
-      })
+    })
 
 
     .catch(function(error) {
 
-
-        console.error(
-          "Save bill error:",
-          error
-        );
-
-
-        showToast(
-          getErrorMessage(error)
-        );
+      console.error(
+        "Save bill error:",
+        error
+      );
 
 
-      });
+      hideLoading();
+
+
+      showToast(
+        getErrorMessage(error)
+      );
+
+    });
 
 }
-
 
 
 /* =====================================================
@@ -3893,8 +3845,7 @@ displaySelectedBill();
 
 
 
-function displaySelectedBill(){
-
+function displaySelectedBill() {
 
   const selectedMonth =
     document
@@ -3904,128 +3855,183 @@ function displaySelectedBill(){
       .value;
 
 
-
   const bill =
     APP.actualBills.find(
-      function(item){
+      function(item) {
 
         return (
-          item.month === selectedMonth
+          String(item.month).trim()
+          ===
+          String(selectedMonth).trim()
         );
 
       }
     );
 
 
+  console.log(
+    "================================="
+  );
+
+  console.log(
+    "SELECTED MONTH:",
+    selectedMonth
+  );
+
+  console.log(
+    "ALL ACTUAL BILLS:",
+    APP.actualBills
+  );
 
   console.log(
     "SELECTED BILL:",
     bill
   );
 
+  console.log(
+    "================================="
+  );
 
 
-  if(!bill){
+  if (!bill) {
+
+    console.warn(
+      "NO BILL FOUND FOR MONTH:",
+      selectedMonth
+    );
 
     return;
 
   }
 
 
-
-  document
-    .getElementById(
+  /*
+   * Month
+   */
+  const month =
+    document.getElementById(
       "billViewMonth"
-    )
-    .textContent =
-    bill.month || "—";
-
-
-
-  document
-    .getElementById(
-      "billViewAmount"
-    )
-    .textContent =
-    formatPHP(
-      bill.actualBill
     );
 
+  if (month) {
+
+    month.textContent =
+      bill.month || "—";
+
+  }
 
 
-  document
-    .getElementById(
+  /*
+   * Actual Bill
+   */
+  const amount =
+    document.getElementById(
+      "billViewAmount"
+    );
+
+  if (amount) {
+
+    amount.textContent =
+      formatPHP(
+        bill.actualBill
+      );
+
+  }
+
+
+  /*
+   * Actual kWh
+   */
+  const kwh =
+    document.getElementById(
       "billViewKwh"
-    )
-    .textContent =
-    formatNumber(
-      bill.actualKwh,
-      2
-    )
-    +
-    " kWh";
+    );
+
+  if (kwh) {
+
+    kwh.textContent =
+      formatNumber(
+        bill.actualKwh,
+        2
+      ) +
+      " kWh";
+
+  }
 
 
+  /*
+   * Rate Per kWh
+   */
+  const rate =
+    document.getElementById(
+      "billViewRate"
+    );
 
-  document
-.getElementById(
-"billViewGeneration"
-)
-.textContent =
-formatPHP(
-bill.generation
-);
+  if (rate) {
 
+    rate.textContent =
+      formatPHP(
+        bill.ratePerKwh
+      ) +
+      " / kWh";
 
-
-  document.getElementById("billViewTransmission").textContent = formatPHP(bill.transmission);
-
-
-
-  document.getElementById("billViewSystemLoss").textContent = formatPHP(bill.systemLoss);
-
-
-
-  document.getElementById("billViewDistribution").textContent = formatPHP(bill.distribution);
+  }
 
 
+  /*
+   * Difference vs Estimate - kWh
+   */
+  const differenceKwh =
+    document.getElementById(
+      "billViewDifferenceKwh"
+    );
 
-  document.getElementById("billViewGovernmentTaxes").textContent = formatPHP(bill.governmentTaxes);
+  if (differenceKwh) {
 
-document.getElementById("billViewUniversalCharges").textContent = formatPHP(bill.universalCharges);
+    differenceKwh.textContent =
+      formatNumber(
+        bill.differenceVsEstimateKwh,
+        2
+      ) +
+      " kWh";
 
-document.getElementById("billViewFitAll").textContent = formatPHP(bill.fitAll);
-
-document.getElementById("billViewGeaAll").textContent = formatPHP(bill.geaAll);
-
-document.getElementById("billViewLifeline").textContent = formatPHP(bill.lifeline);
-
-document.getElementById("billViewOtherCharges").textContent = formatPHP(bill.otherCharges);
-
+  }
 
 
-  document
-    .getElementById(
+  /*
+   * Difference vs Estimate - Cost
+   */
+  const differenceCost =
+    document.getElementById(
+      "billViewDifferenceCost"
+    );
+
+  if (differenceCost) {
+
+    differenceCost.textContent =
+      formatPHP(
+        bill.differenceVsEstimateCost
+      );
+
+  }
+
+
+  /*
+   * Notes
+   */
+  const notes =
+    document.getElementById(
       "billViewMessage"
-    )
-    .textContent =
-    bill.notes || "";
+    );
 
-// Fill edit fields
-document.getElementById("editGeneration").value = bill.generation || 0;
-document.getElementById("editTransmission").value = bill.transmission || 0;
-document.getElementById("editSystemLoss").value = bill.systemLoss || 0;
-document.getElementById("editDistribution").value = bill.distribution || 0;
-document.getElementById("editSeniorCitizen").value = bill.seniorCitizen || 0;
-document.getElementById("editGovernmentTaxes").value = bill.governmentTaxes || 0;
-document.getElementById("editUniversalCharges").value = bill.universalCharges || 0;
-document.getElementById("editFitAll").value = bill.fitAll || 0;
-document.getElementById("editGeaAll").value = bill.geaAll || 0;
-document.getElementById("editLifeline").value = bill.lifeline || 0;
-document.getElementById("editOtherCharges").value = bill.otherCharges || 0;
+  if (notes) {
+
+    notes.textContent =
+      bill.notes || "";
+
+  }
 
 }
-
 
 
 
@@ -5115,7 +5121,6 @@ function closeResetPassword() {
 
 async function submitResetPassword() {
 
-
   const email =
     document.getElementById(
       "resetEmail"
@@ -5147,6 +5152,16 @@ async function submitResetPassword() {
     );
 
 
+  const resetButton =
+    document.getElementById(
+      "resetPasswordButton"
+    );
+
+
+  /*
+   * VALIDATE FIELDS FIRST
+   */
+
   if (!email || !code || !newPassword) {
 
     message.innerText =
@@ -5159,6 +5174,24 @@ async function submitResetPassword() {
     return;
 
   }
+
+
+  /*
+   * SHOW LOADING ON BUTTON
+   */
+
+  if (resetButton) {
+
+    resetButton.disabled = true;
+
+    resetButton.innerText =
+      "Password is being reset...";
+
+  }
+
+
+  message.classList.remove("show");
+  message.innerText = "";
 
 
   try {
@@ -5175,6 +5208,24 @@ async function submitResetPassword() {
       );
 
 
+    /*
+     * RESTORE BUTTON
+     */
+
+    if (resetButton) {
+
+      resetButton.disabled = false;
+
+      resetButton.innerText =
+        "Reset Password";
+
+    }
+
+
+    /*
+     * SUCCESS
+     */
+
     if (
       result &&
       result.success
@@ -5189,7 +5240,7 @@ async function submitResetPassword() {
 
 
       setTimeout(
-        function(){
+        function() {
 
           closeResetPassword();
 
@@ -5201,10 +5252,13 @@ async function submitResetPassword() {
     } else {
 
 
+      /*
+       * SERVER ERROR
+       */
+
       message.innerText =
         result.message ||
         "Unable to reset password.";
-
 
       message.classList.add(
         "show"
@@ -5216,22 +5270,30 @@ async function submitResetPassword() {
   } catch(error) {
 
 
+    /*
+     * RESTORE BUTTON ON ERROR
+     */
+
+    if (resetButton) {
+
+      resetButton.disabled = false;
+
+      resetButton.innerText =
+        "Reset Password";
+
+    }
+
+
     message.innerText =
       error.message;
-
 
     message.classList.add(
       "show"
     );
 
-
   }
 
-
 }
-
-
-
 
 
 /*******************************************************
@@ -5240,7 +5302,6 @@ async function submitResetPassword() {
 
 
 async function sendResetCode() {
-
 
   const email =
     document.getElementById(
@@ -5257,6 +5318,16 @@ async function sendResetCode() {
     );
 
 
+  const sendButton =
+    document.getElementById(
+      "sendResetCodeButton"
+    );
+
+
+  /*
+   * VALIDATE EMAIL FIRST
+   */
+
   if (!email) {
 
     message.innerText =
@@ -5271,8 +5342,25 @@ async function sendResetCode() {
   }
 
 
-  try {
+  /*
+   * CHANGE BUTTON TEXT
+   */
 
+  if (sendButton) {
+
+    sendButton.disabled = true;
+
+    sendButton.innerText =
+      "Sending Code to Your Email...";
+
+  }
+
+
+  message.classList.remove("show");
+  message.innerText = "";
+
+
+  try {
 
     const result =
       await apiCall(
@@ -5282,6 +5370,24 @@ async function sendResetCode() {
         }
       );
 
+
+    /*
+     * RESTORE BUTTON
+     */
+
+    if (sendButton) {
+
+      sendButton.disabled = false;
+
+      sendButton.innerText =
+        "Send Reset Code";
+
+    }
+
+
+    /*
+     * SUCCESS
+     */
 
     if (
       result &&
@@ -5318,21 +5424,30 @@ async function sendResetCode() {
   } catch(error) {
 
 
+    /*
+     * RESTORE BUTTON ON ERROR
+     */
+
+    if (sendButton) {
+
+      sendButton.disabled = false;
+
+      sendButton.innerText =
+        "Send Reset Code";
+
+    }
+
+
     message.innerText =
       error.message;
-
 
     message.classList.add(
       "show"
     );
 
-
   }
 
-
 }
-
-
 
 
 /*******************************************************
@@ -5392,10 +5507,13 @@ function openRegister() {
     );
 
   if (!modal) {
-    console.error(
-      'registerModal not found.'
+
+    alert(
+      'Registration modal not found.'
     );
+
     return;
+
   }
 
   modal.classList.remove(
@@ -5666,4 +5784,7 @@ function submitRegister(event) {
     );
 
 }
+
+
+
 
