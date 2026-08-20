@@ -4810,7 +4810,8 @@ if(loadingOverlay){
       function(item){
 
         return (
-          item.month === selectedMonth
+          String(item.month || "").trim() ===
+          String(selectedMonth || "").trim()
         );
 
       }
