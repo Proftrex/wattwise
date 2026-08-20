@@ -1,4 +1,4 @@
-package com.wattwise.app;
+package com.wattwise.tracker;
 
 import android.os.Bundle;
 import android.webkit.WebSettings;

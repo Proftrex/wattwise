@@ -3118,3 +3118,518 @@ form {
 }
 
 
+
+
+/* =====================================================
+   RESET PASSWORD MODAL
+   ===================================================== */
+
+#resetPasswordModal .small-modal {
+
+  width: min(420px, calc(100% - 40px));
+
+  margin: 20px;
+
+  padding: 0;
+
+}
+
+
+#resetPasswordModal .modal-content {
+
+  border-radius: 15px;
+
+}
+
+
+#resetPasswordModal .form-group {
+
+  padding-left: 22px;
+
+  padding-right: 22px;
+
+}
+
+
+#resetPasswordModal .modal-actions {
+
+  padding: 20px 22px;
+
+}
+
+
+/* Mobile */
+@media (max-width: 600px) {
+
+  #resetPasswordModal {
+
+    padding: 15px;
+
+  }
+
+
+  #resetPasswordModal .small-modal {
+
+    width: 100%;
+
+    max-width: 100%;
+
+  }
+
+
+  #resetPasswordModal .form-group {
+
+    padding-left: 18px;
+
+    padding-right: 18px;
+
+  }
+
+}
+
+
+
+/* Forgot password reset link */
+.forgot-password span {
+
+  text-decoration: underline;
+
+  cursor: pointer;
+
+}
+
+
+
+
+/* Center Send Reset Code button */
+#resetPasswordModal .secondary-button {
+
+  display: block;
+
+  margin-left: auto;
+
+  margin-right: auto;
+
+}
+
+
+
+
+/* Add spacing below reset modal header */
+#resetPasswordModal .form-group:first-of-type {
+
+  margin-top: 25px;
+
+}
+
+
+
+
+/* Spacing below login button */
+.forgot-password {
+
+  margin-top: 18px;
+
+}
+
+
+
+
+/* Password visibility toggle */
+
+.password-wrapper {
+
+  position: relative;
+
+}
+
+
+.password-wrapper input {
+
+  padding-right: 55px;
+
+}
+
+
+.password-toggle {
+
+  position: absolute;
+
+  right: 18px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 24px;
+
+  height: 24px;
+
+  cursor: pointer;
+
+}
+
+
+
+
+/* =====================================================
+   CUTE PASTEL GREEN LOADING SCREEN
+   ===================================================== */
+
+
+
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+
+}
+
+
+/* =====================================================
+   LOADING BOX PASTEL GREEN COLOR
+   ===================================================== */
+
+.loading-box {
+
+  background:
+    #f0faeb;
+
+}
+
+
+
+
+/* FORCE LOADING BOX PASTEL GREEN */
+
+.loading-box {
+
+  background:
+    #e8f8e3 !important;
+
+}
+
+
+/* =====================================================
+   WATTWISE REGISTRATION MODAL
+   ===================================================== */
+
+#registerModal {
+  position: fixed !important;
+  inset: 0 !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 24px !important;
+
+  background: rgba(246, 248, 245, 0.88) !important;
+
+  z-index: 999999 !important;
+}
+
+
+/* Keep it hidden when closed */
+#registerModal.hidden {
+  display: none !important;
+}
+
+
+/* Registration background overlay */
+#registerModal .modal-overlay {
+  position: absolute !important;
+
+  inset: 0 !important;
+
+  background:
+    rgba(246, 248, 245, 0.88) !important;
+
+  backdrop-filter:
+    blur(4px);
+
+  z-index: 0 !important;
+}
+
+
+/* Registration card */
+#registerModal .modal-content {
+  position: relative !important;
+
+  z-index: 2 !important;
+
+  width: min(460px, 100%) !important;
+
+  max-height: calc(100vh - 48px) !important;
+
+  overflow-y: auto !important;
+
+  margin: 0 auto !important;
+
+  background: #ffffff !important;
+
+  border:
+    1px solid #dcebd8 !important;
+
+  border-radius: 22px !important;
+
+  box-shadow:
+    0 24px 70px rgba(39, 70, 39, 0.18) !important;
+
+  overflow-x: hidden !important;
+}
+
+
+/* Green WattWise branding header */
+#registerModal .modal-header {
+  position: relative;
+
+  padding: 28px 28px 22px !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #eefbea 0%,
+      #f8fcf6 100%
+    ) !important;
+
+  border-bottom:
+    1px solid #e1eee0 !important;
+
+  text-align: center;
+
+  display: block !important;
+}
+
+
+/* WattWise icon */
+#registerModal .modal-header::before {
+  content: "⚡";
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 54px;
+  height: 54px;
+
+  margin: 0 auto 12px;
+
+  border-radius: 16px;
+
+  background: #ffffff;
+
+  color: #55b941;
+
+  font-size: 25px;
+
+  box-shadow:
+    0 5px 15px rgba(85, 185, 65, 0.12);
+}
+
+
+/* Registration title */
+#registerModal .modal-header h2 {
+
+  margin: 0 0 6px !important;
+
+  color: #14532d !important;
+
+  font-size: 21px !important;
+
+  font-weight: 800 !important;
+
+  letter-spacing: -0.3px;
+}
+
+
+/* Registration subtitle */
+#registerModal .modal-header p {
+
+  margin: 0 !important;
+
+  color: #6d766d !important;
+
+  font-size: 13px !important;
+
+  line-height: 1.5;
+}
+
+
+/* Close button */
+#registerModal .close-button {
+
+  position: absolute !important;
+
+  top: 18px;
+  right: 18px;
+
+  width: 34px;
+  height: 34px;
+
+  border: none !important;
+
+  background: #ffffff !important;
+
+  color: #6d766d !important;
+
+  border-radius: 50% !important;
+
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.06);
+
+}
+
+
+/* Form */
+#registerModal form {
+
+  padding: 24px 28px 28px !important;
+}
+
+
+/* Form labels */
+#registerModal .form-group label {
+
+  color: #5f5148 !important;
+
+  font-size: 13px !important;
+
+  font-weight: 700 !important;
+}
+
+
+/* Form inputs */
+#registerModal input {
+
+  width: 100% !important;
+
+  background: #fffdf8 !important;
+
+  border:
+    1px solid #eadfcf !important;
+
+  border-radius: 12px !important;
+
+  padding: 13px 14px !important;
+
+  color: #493c34 !important;
+
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+
+#registerModal input:focus {
+
+  outline: none !important;
+
+  border-color: #79d862 !important;
+
+  box-shadow:
+    0 0 0 3px rgba(121, 216, 98, 0.14) !important;
+}
+
+
+/* Buttons */
+#registerModal .modal-actions {
+
+  margin-top: 24px !important;
+
+  justify-content: flex-end !important;
+}
+
+
+#registerModal .primary-button {
+
+  background: #79d862 !important;
+
+  color: #ffffff !important;
+
+  border: none !important;
+
+  border-radius: 11px !important;
+
+  padding: 12px 20px !important;
+
+  font-weight: 700 !important;
+
+  box-shadow:
+    0 4px 12px rgba(85, 185, 65, 0.18);
+}
+
+
+#registerModal .primary-button:hover {
+
+  background: #55b941 !important;
+}
+
+
+#registerModal .secondary-button {
+
+  background: #ffffff !important;
+
+  color: #6b584b !important;
+
+  border:
+    1px solid #eadfcf !important;
+
+  border-radius: 11px !important;
+
+  padding: 12px 18px !important;
+
+}
+
+
+/* Mobile */
+@media (max-width: 600px) {
+
+  #registerModal {
+
+    padding: 14px !important;
+
+  }
+
+  #registerModal .modal-content {
+
+    width: 100% !important;
+
+    max-height:
+      calc(100vh - 28px) !important;
+
+    border-radius: 18px !important;
+
+  }
+
+  #registerModal .modal-header {
+
+    padding:
+      24px 20px 18px !important;
+
+  }
+
+  #registerModal form {
+
+    padding:
+      20px !important;
+
+  }
+
+  #registerModal .modal-actions {
+
+    flex-direction: column-reverse !important;
+
+  }
+
+  #registerModal .modal-actions button {
+
+    width: 100% !important;
+
+  }
+
+}
+

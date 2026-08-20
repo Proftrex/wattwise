@@ -4934,14 +4934,6 @@ if(loadingOverlay){
 
     .then(function(result){
 
-        if(loadingOverlay){
-
-  loadingOverlay.classList.add(
-    "hidden"
-  );
-
-}
-
         console.log(
           "UPDATE RESULT:",
           result
