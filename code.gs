@@ -18,7 +18,8 @@ const SHEETS = {
   ESTIMATES: 'Monthly_Estimates',
   BILLS: 'Bill History',
   ALERTS: 'Alerts',
-  SETTINGS: 'Settings'
+  SETTINGS: 'Settings',
+  PASSWORD_RESETS: 'Password Resets'
 };
 
 /**
