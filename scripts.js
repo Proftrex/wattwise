@@ -5046,9 +5046,24 @@ if(loadingOverlay){
         ).style.display =
           "none";
 
-        showToast(
-          "Bill updated successfully."
-        );
+        if(loadingText){
+
+          loadingText.textContent =
+            "Bill updated successfully";
+
+        }
+
+        setTimeout(function(){
+
+          if(loadingOverlay){
+
+            loadingOverlay.classList.add(
+              "hidden"
+            );
+
+          }
+
+        }, 1500);
 
       })
 
@@ -6243,19 +6258,6 @@ function deleteCurrentBill(){
     showToast(
       "Bill ID is missing."
     );
-
-    return;
-
-  }
-
-
-  const confirmed =
-    confirm(
-      "Are you sure you want to delete this bill?"
-    );
-
-
-  if(!confirmed){
 
     return;
 
