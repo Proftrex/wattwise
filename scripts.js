@@ -6173,3 +6173,227 @@ function submitRegister(event) {
 
 
 
+
+
+function deleteCurrentBill(){
+
+  console.log(
+    "DELETE BILL FIRED"
+  );
+
+
+  const dropdown =
+    document.getElementById(
+      "billMonthDropdown"
+    );
+
+
+  if(!dropdown){
+
+    showToast(
+      "Unable to identify the selected bill."
+    );
+
+    return;
+
+  }
+
+
+  const selectedMonth =
+    String(
+      dropdown.value || ""
+    ).trim();
+
+
+  const bill =
+    APP.actualBills.find(
+      function(item){
+
+        return (
+          String(
+            item.month || ""
+          ).trim()
+          ===
+          selectedMonth
+        );
+
+      }
+    );
+
+
+  console.log(
+    "BILL TO DELETE:",
+    bill
+  );
+
+
+  if(!bill){
+
+    showToast(
+      "Unable to find the selected bill."
+    );
+
+    return;
+
+  }
+
+
+  if(!bill.billId){
+
+    showToast(
+      "Bill ID is missing."
+    );
+
+    return;
+
+  }
+
+
+  const confirmed =
+    confirm(
+      "Are you sure you want to delete this bill?"
+    );
+
+
+  if(!confirmed){
+
+    return;
+
+  }
+
+
+  const loadingOverlay =
+    document.querySelector(
+      ".loading-overlay"
+    );
+
+
+  const loadingText =
+    document.getElementById(
+      "loadingText"
+    );
+
+
+  if(loadingText){
+
+    loadingText.textContent =
+      "Deleting bill...";
+
+  }
+
+
+  if(loadingOverlay){
+
+    loadingOverlay.classList.remove(
+      "hidden"
+    );
+
+  }
+
+
+  deleteSavedBill(
+    APP.userId,
+    bill.billId
+  )
+
+  .then(function(result){
+
+    console.log(
+      "DELETE RESULT:",
+      result
+    );
+
+
+    if(
+      !result ||
+      !result.success
+    ){
+
+      if(loadingOverlay){
+
+        loadingOverlay.classList.add(
+          "hidden"
+        );
+
+      }
+
+
+      showToast(
+        result &&
+        result.message
+          ? result.message
+          : "Unable to delete bill."
+      );
+
+      return;
+
+    }
+
+
+    if(loadingText){
+
+      loadingText.textContent =
+        "Bill deleted successfully";
+
+    }
+
+
+    APP.actualBills =
+      APP.actualBills.filter(
+        function(item){
+
+          return (
+            String(
+              item.billId || ""
+            ).trim()
+            !==
+            String(
+              bill.billId
+            ).trim()
+          );
+
+        }
+      );
+
+
+    setTimeout(function(){
+
+      populateBillMonths();
+
+      if(loadingOverlay){
+
+        loadingOverlay.classList.add(
+          "hidden"
+        );
+
+      }
+
+    }, 1500);
+
+
+  })
+
+  .catch(function(error){
+
+    console.error(
+      "DELETE BILL ERROR:",
+      error
+    );
+
+
+    if(loadingOverlay){
+
+      loadingOverlay.classList.add(
+        "hidden"
+      );
+
+    }
+
+
+    showToast(
+      getErrorMessage(error)
+    );
+
+  });
+
+}

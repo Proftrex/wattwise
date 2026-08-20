@@ -12,22 +12,40 @@ async function apiCall(action, data = {}) {
 
 
   Object.keys(data).forEach(
-    function(key){
+    function(key) {
 
-      if(
-        typeof data[key] === "object"
-      ){
+      const value = data[key];
+
+
+      if (key === "data") {
+
+        params.append(
+          "data",
+          JSON.stringify(value)
+        );
+
+        return;
+
+      }
+
+
+      if (
+        value !== null &&
+        typeof value === "object"
+      ) {
 
         params.append(
           key,
-          JSON.stringify(data[key])
+          JSON.stringify(value)
         );
 
       } else {
 
         params.append(
           key,
-          data[key]
+          value == null
+            ? ""
+            : String(value)
         );
 
       }
@@ -36,15 +54,54 @@ async function apiCall(action, data = {}) {
   );
 
 
-  const response = await fetch(
-    API_URL + "?" + params.toString()
+  const url =
+    API_URL +
+    "?" +
+    params.toString();
+
+
+  console.log(
+    "API ACTION:",
+    action
+  );
+
+  console.log(
+    "API DATA:",
+    data
+  );
+
+  console.log(
+    "API URL:",
+    url
   );
 
 
-  return await response.json();
+  const response =
+    await fetch(url);
+
+
+  const text =
+    await response.text();
+
+
+  console.log(
+    "API RESPONSE:",
+    text
+  );
+
+
+  if (!text) {
+
+    throw new Error(
+      "Empty response from server."
+    );
+
+  }
+
+
+  return JSON.parse(text);
 
 }
-
 
 // USER
 
@@ -128,7 +185,9 @@ async function addAppliance(data) {
 
   return await apiCall(
     "addAppliance",
-    data
+    {
+      data: data
+    }
   );
 
 }
@@ -138,7 +197,9 @@ async function updateAppliance(data) {
 
   return await apiCall(
     "updateAppliance",
-    data
+    {
+      data: data
+    }
   );
 
 }
@@ -163,7 +224,9 @@ async function saveActualBillDirect(data) {
 
   return await apiCall(
     "saveActualBillDirect",
-    data
+    {
+      data: data
+    }
   );
 
 }
@@ -186,7 +249,9 @@ async function addElectricityRate(data) {
 
   return await apiCall(
     "addElectricityRate",
-    data
+    {
+      data: data
+    }
   );
 
 }
@@ -204,6 +269,19 @@ async function getActualBills(userId) {
 
 }
 
+
+
+async function deleteSavedBill(userId, billId) {
+
+  return await apiCall(
+    "deleteSavedBill",
+    {
+      userId: userId,
+      billId: billId
+    }
+  );
+
+}
 
 
 async function updateSavedBill(userId, billId, data) {

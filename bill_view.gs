@@ -1146,3 +1146,191 @@ function updateSavedBill(userId, billId, data) {
   };
 
 }
+
+
+// =====================================
+// DELETE SAVED ACTUAL BILL
+// Deletes an existing Bill History row
+// =====================================
+function deleteSavedBill(userId, billId){
+
+  Logger.log("==============================");
+  Logger.log("DELETE SAVED BILL");
+  Logger.log("==============================");
+  Logger.log("USER ID: " + userId);
+  Logger.log("BILL ID: " + billId);
+
+
+  if(!userId){
+
+    throw new Error(
+      "User ID is required."
+    );
+
+  }
+
+
+  if(!billId){
+
+    throw new Error(
+      "Bill ID is required."
+    );
+
+  }
+
+
+  const spreadsheetId =
+    getUserSpreadsheetId(
+      userId
+    );
+
+
+  if(!spreadsheetId){
+
+    throw new Error(
+      "User spreadsheet not found."
+    );
+
+  }
+
+
+  const ss =
+    SpreadsheetApp.openById(
+      spreadsheetId
+    );
+
+
+  const sheet =
+    ss.getSheetByName(
+      "Bill History"
+    );
+
+
+  if(!sheet){
+
+    throw new Error(
+      "Bill History sheet not found."
+    );
+
+  }
+
+
+  const values =
+    sheet
+      .getDataRange()
+      .getValues();
+
+
+  if(values.length <= 1){
+
+    throw new Error(
+      "No bills recorded."
+    );
+
+  }
+
+
+  const headers =
+    values[0];
+
+
+  const billIdIndex =
+    headers.indexOf(
+      "Bill ID"
+    );
+
+
+  const userIdIndex =
+    headers.indexOf(
+      "User ID"
+    );
+
+
+  if(
+    billIdIndex === -1 ||
+    userIdIndex === -1
+  ){
+
+    throw new Error(
+      "Bill History is missing Bill ID or User ID column."
+    );
+
+  }
+
+
+  let targetRow = -1;
+
+
+  for(
+    let i = 1;
+    i < values.length;
+    i++
+  ){
+
+    const row =
+      values[i];
+
+
+    const rowBillId =
+      String(
+        row[billIdIndex] || ""
+      ).trim();
+
+
+    const rowUserId =
+      String(
+        row[userIdIndex] || ""
+      ).trim();
+
+
+    if(
+      rowBillId ===
+      String(billId).trim()
+      &&
+      rowUserId ===
+      String(userId).trim()
+    ){
+
+      targetRow =
+        i + 1;
+
+      break;
+
+    }
+
+  }
+
+
+  if(targetRow === -1){
+
+    throw new Error(
+      "Bill record not found."
+    );
+
+  }
+
+
+  sheet.deleteRow(
+    targetRow
+  );
+
+
+  SpreadsheetApp.flush();
+
+
+  Logger.log(
+    "BILL DELETED - ROW: " +
+    targetRow
+  );
+
+
+  return {
+
+    success: true,
+
+    message:
+      "Bill deleted successfully."
+
+  };
+
+}

@@ -907,6 +907,24 @@ function setupDedicatedSpreadsheet_(
     ]
   );
 
+
+  /**
+   * Password Resets.
+   */
+  createDedicatedSheet_(
+    spreadsheet,
+    SHEETS.PASSWORD_RESETS,
+    [
+      'Reset ID',
+      'Email',
+      'Reset Code',
+      'Created At',
+      'Expiry',
+      'Used',
+      'Status'
+    ]
+  );
+
   /**
    * Populate categories.
    */
@@ -3017,6 +3035,238 @@ function setUserPassword(email, password) {
     message:
       "Email not found."
   };
+
+}
+
+
+
+/*******************************************************
+ * PASSWORD RESET SYSTEM
+ *******************************************************/
+
+
+function requestPasswordReset(email) {
+
+  const users =
+    getSheetRecords(
+      SHEETS.USERS
+    );
+
+
+  const user =
+    users.find(function(row){
+
+      return (
+        toSafeString(row.Email)
+        .toLowerCase()
+        ===
+        email.toLowerCase()
+      );
+
+    });
+
+
+  if (!user) {
+
+    return {
+      success:false,
+      message:"Email account not found."
+    };
+
+  }
+
+
+  const sheet =
+    getSheet(
+      SHEETS.PASSWORD_RESETS
+    );
+
+
+  const code =
+    Math.floor(
+      100000 +
+      Math.random() * 900000
+    )
+    .toString();
+
+
+  const now =
+    new Date();
+
+
+  const expiry =
+    new Date(
+      now.getTime() + (10 * 60 * 1000)
+    );
+
+
+  const resetId =
+    "RESET-" + Date.now();
+
+
+  sheet.appendRow([
+
+    resetId,
+
+    email,
+
+    code,
+
+    now,
+
+    expiry,
+
+    false,
+
+    "ACTIVE"
+
+  ]);
+
+
+  return {
+
+    success:true,
+
+    message:
+      "Reset code generated.",
+
+    code:code
+
+  };
+
+}
+
+
+
+function resetPassword(
+  email,
+  code,
+  newPassword
+) {
+
+
+  const sheet =
+    getSheet(
+      SHEETS.PASSWORD_RESETS
+    );
+
+
+  const data =
+    sheet
+      .getDataRange()
+      .getValues();
+
+
+
+  for(
+    let i = 1;
+    i < data.length;
+    i++
+  ) {
+
+
+    const rowEmail =
+      toSafeString(
+        data[i][1]
+      )
+      .toLowerCase();
+
+
+    const rowCode =
+      toSafeString(
+        data[i][2]
+      );
+
+
+    const used =
+      data[i][5];
+
+
+    if(
+      rowEmail === email.toLowerCase()
+      &&
+      rowCode === code
+      &&
+      used !== true
+    ) {
+
+
+      const expiry =
+        new Date(
+          data[i][4]
+        );
+
+
+      if(
+        new Date() > expiry
+      ) {
+
+        return {
+
+          success:false,
+
+          message:
+          "Reset code expired."
+
+        };
+
+      }
+
+
+
+      setUserPassword(
+        email,
+        newPassword
+      );
+
+
+
+      sheet
+        .getRange(
+          i + 1,
+          6
+        )
+        .setValue(
+          true
+        );
+
+
+      sheet
+        .getRange(
+          i + 1,
+          7
+        )
+        .setValue(
+          "COMPLETED"
+        );
+
+
+
+      return {
+
+        success:true,
+
+        message:
+        "Password updated successfully."
+
+      };
+
+
+    }
+
+  }
+
+
+
+  return {
+
+    success:false,
+
+    message:
+    "Invalid reset code."
+
+  };
+
 
 }
 
