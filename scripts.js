@@ -3914,13 +3914,20 @@ displaySelectedBill();
 
 function displaySelectedBill() {
 
-  const selectedMonth =
-    document
-      .getElementById(
-        "billMonthDropdown"
-      )
-      .value;
+  const dropdown =
+    document.getElementById(
+      "billMonthDropdown"
+    );
 
+  if (!dropdown) {
+    console.error(
+      "billMonthDropdown not found"
+    );
+    return;
+  }
+
+  const selectedMonth =
+    dropdown.value;
 
   const bill =
     APP.actualBills.find(
@@ -3935,23 +3942,21 @@ function displaySelectedBill() {
       }
     );
 
-
   console.log(
     "================================="
   );
 
   console.log(
-    "SELECTED MONTH:",
+    "DISPLAYING SELECTED BILL"
+  );
+
+  console.log(
+    "Selected month:",
     selectedMonth
   );
 
   console.log(
-    "ALL ACTUAL BILLS:",
-    APP.actualBills
-  );
-
-  console.log(
-    "SELECTED BILL:",
+    "Selected bill:",
     bill
   );
 
@@ -3972,9 +3977,10 @@ function displaySelectedBill() {
   }
 
 
-  /*
-   * Month
-   */
+  // =====================================
+  // MONTH
+  // =====================================
+
   const month =
     document.getElementById(
       "billViewMonth"
@@ -3988,27 +3994,10 @@ function displaySelectedBill() {
   }
 
 
-  /*
-   * Actual Bill
-   */
-  const amount =
-    document.getElementById(
-      "billViewAmount"
-    );
+  // =====================================
+  // ACTUAL CONSUMPTION
+  // =====================================
 
-  if (amount) {
-
-    amount.textContent =
-      formatPHP(
-        bill.actualBill
-      );
-
-  }
-
-
-  /*
-   * Actual kWh
-   */
   const kwh =
     document.getElementById(
       "billViewKwh"
@@ -4026,9 +4015,270 @@ function displaySelectedBill() {
   }
 
 
-  /*
-   * Rate Per kWh
-   */
+  // =====================================
+  // GENERATION
+  // =====================================
+
+  const generation =
+    document.getElementById(
+      "billViewGeneration"
+    );
+
+  if (generation) {
+
+    generation.textContent =
+      formatPHP(
+        bill.generation
+      );
+
+  }
+
+
+  // =====================================
+  // TRANSMISSION
+  // =====================================
+
+  const transmission =
+    document.getElementById(
+      "billViewTransmission"
+    );
+
+  if (transmission) {
+
+    transmission.textContent =
+      formatPHP(
+        bill.transmission
+      );
+
+  }
+
+
+  // =====================================
+  // SYSTEM LOSS
+  // =====================================
+
+  const systemLoss =
+    document.getElementById(
+      "billViewSystemLoss"
+    );
+
+  if (systemLoss) {
+
+    systemLoss.textContent =
+      formatPHP(
+        bill.systemLoss
+      );
+
+  }
+
+
+  // =====================================
+  // DISTRIBUTION
+  // =====================================
+
+  const distribution =
+    document.getElementById(
+      "billViewDistribution"
+    );
+
+  if (distribution) {
+
+    distribution.textContent =
+      formatPHP(
+        bill.distribution
+      );
+
+  }
+
+
+  // =====================================
+  // SENIOR CITIZEN
+  // =====================================
+
+  const seniorCitizen =
+    document.getElementById(
+      "billViewSeniorCitizen"
+    );
+
+  if (seniorCitizen) {
+
+    seniorCitizen.textContent =
+      formatPHP(
+        bill.seniorCitizen
+      );
+
+  }
+
+
+  // =====================================
+  // GOVERNMENT TAXES
+  // =====================================
+
+  const governmentTaxes =
+    document.getElementById(
+      "billViewGovernmentTaxes"
+    );
+
+  if (governmentTaxes) {
+
+    governmentTaxes.textContent =
+      formatPHP(
+        bill.governmentTaxes
+      );
+
+  }
+
+
+  // =====================================
+  // UNIVERSAL CHARGES
+  // =====================================
+
+  const universalCharges =
+    document.getElementById(
+      "billViewUniversalCharges"
+    );
+
+  if (universalCharges) {
+
+    universalCharges.textContent =
+      formatPHP(
+        bill.universalCharges
+      );
+
+  }
+
+
+  // =====================================
+  // FIT-ALL
+  // =====================================
+
+  const fitAll =
+    document.getElementById(
+      "billViewFitAll"
+    );
+
+  if (fitAll) {
+
+    fitAll.textContent =
+      formatPHP(
+        bill.fitAll
+      );
+
+  }
+
+
+  // =====================================
+  // GEA-ALL
+  // =====================================
+
+  const geaAll =
+    document.getElementById(
+      "billViewGeaAll"
+    );
+
+  if (geaAll) {
+
+    geaAll.textContent =
+      formatPHP(
+        bill.geaAll
+      );
+
+  }
+
+
+  // =====================================
+  // LIFELINE
+  // =====================================
+
+  const lifeline =
+    document.getElementById(
+      "billViewLifeline"
+    );
+
+  if (lifeline) {
+
+    lifeline.textContent =
+      formatPHP(
+        bill.lifeline
+      );
+
+  }
+
+
+  // =====================================
+  // OTHER CHARGES
+  // =====================================
+
+  const otherCharges =
+    document.getElementById(
+      "billViewOtherCharges"
+    );
+
+  if (otherCharges) {
+
+    otherCharges.textContent =
+      formatPHP(
+        bill.otherCharges
+      );
+
+  }
+
+
+  // =====================================
+  // TOTAL ADDITIONAL CHARGES
+  // =====================================
+
+  const totalAdditionalCharges =
+    Number(bill.transmission || 0) +
+    Number(bill.systemLoss || 0) +
+    Number(bill.distribution || 0) +
+    Number(bill.seniorCitizen || 0) +
+    Number(bill.governmentTaxes || 0) +
+    Number(bill.universalCharges || 0) +
+    Number(bill.fitAll || 0) +
+    Number(bill.geaAll || 0) +
+    Number(bill.lifeline || 0) +
+    Number(bill.otherCharges || 0);
+
+
+  const totalElement =
+    document.getElementById(
+      "billViewTotalAdditionalCharges"
+    );
+
+  if (totalElement) {
+
+    totalElement.textContent =
+      formatPHP(
+        totalAdditionalCharges
+      );
+
+  }
+
+
+  // =====================================
+  // TOTAL ACTUAL BILL
+  // =====================================
+
+  const amount =
+    document.getElementById(
+      "billViewAmount"
+    );
+
+  if (amount) {
+
+    amount.textContent =
+      formatPHP(
+        bill.actualBill
+      );
+
+  }
+
+
+  // =====================================
+  // RATE
+  // =====================================
+
   const rate =
     document.getElementById(
       "billViewRate"
@@ -4045,9 +4295,10 @@ function displaySelectedBill() {
   }
 
 
-  /*
-   * Difference vs Estimate - kWh
-   */
+  // =====================================
+  // DIFFERENCE VS ESTIMATE - KWH
+  // =====================================
+
   const differenceKwh =
     document.getElementById(
       "billViewDifferenceKwh"
@@ -4065,9 +4316,10 @@ function displaySelectedBill() {
   }
 
 
-  /*
-   * Difference vs Estimate - Cost
-   */
+  // =====================================
+  // DIFFERENCE VS ESTIMATE - COST
+  // =====================================
+
   const differenceCost =
     document.getElementById(
       "billViewDifferenceCost"
@@ -4083,9 +4335,10 @@ function displaySelectedBill() {
   }
 
 
-  /*
-   * Notes
-   */
+  // =====================================
+  // NOTES
+  // =====================================
+
   const notes =
     document.getElementById(
       "billViewMessage"
@@ -4098,8 +4351,72 @@ function displaySelectedBill() {
 
   }
 
-}
 
+  // =====================================
+  // EDIT INPUTS
+  // =====================================
+
+  const editValues = {
+
+    editGeneration:
+      bill.generation,
+
+    editTransmission:
+      bill.transmission,
+
+    editSystemLoss:
+      bill.systemLoss,
+
+    editDistribution:
+      bill.distribution,
+
+    editSeniorCitizen:
+      bill.seniorCitizen,
+
+    editGovernmentTaxes:
+      bill.governmentTaxes,
+
+    editUniversalCharges:
+      bill.universalCharges,
+
+    editFitAll:
+      bill.fitAll,
+
+    editGeaAll:
+      bill.geaAll,
+
+    editLifeline:
+      bill.lifeline,
+
+    editOtherCharges:
+      bill.otherCharges
+
+  };
+
+
+  Object.keys(editValues)
+    .forEach(
+      function(id) {
+
+        const input =
+          document.getElementById(
+            id
+          );
+
+        if (input) {
+
+          input.value =
+            Number(
+              editValues[id] || 0
+            );
+
+        }
+
+      }
+    );
+
+
+}
 
 
 function changeBillMonth(){
