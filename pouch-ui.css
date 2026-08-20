@@ -1057,3 +1057,57 @@ button,
   color: #6b9b63 !important;
 }
 
+
+/* ===============================
+   CREATE ACCOUNT CLICK FIX
+   =============================== */
+
+.create-account {
+  position: relative !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}
+
+.create-account span {
+  position: relative !important;
+  z-index: 10000 !important;
+  display: inline-block !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  color: #4d7c47 !important;
+  text-decoration: underline !important;
+  font-weight: 700 !important;
+}
+
+.create-account span:hover {
+  color: #6b9b63 !important;
+}
+
+.create-account-link {
+  position: relative !important;
+  z-index: 10000 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+
+  display: inline-block !important;
+
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  color: #4d7c47 !important;
+  text-decoration: underline !important;
+
+  font-family: inherit !important;
+  font-size: inherit !important;
+  font-weight: 700 !important;
+}
+
+.create-account-link:hover {
+  background: transparent !important;
+  color: #6b9b63 !important;
+  transform: none !important;
+}
