@@ -3144,8 +3144,75 @@ function saveActualBill(event) {
 
 
   console.log(
-    "Saving actual bill:",
+    "================================="
+  );
+
+  console.log(
+    "BILL SAVE DIAGNOSTIC"
+  );
+
+  console.log(
+    "generation input:",
+    document.getElementById("generation")?.value
+  );
+
+  console.log(
+    "transmission input:",
+    document.getElementById("transmission")?.value
+  );
+
+  console.log(
+    "systemLoss input:",
+    document.getElementById("systemLoss")?.value
+  );
+
+  console.log(
+    "distribution input:",
+    document.getElementById("distribution")?.value
+  );
+
+  console.log(
+    "seniorCitizen input:",
+    document.getElementById("seniorCitizen")?.value
+  );
+
+  console.log(
+    "governmentTaxes input:",
+    document.getElementById("governmentTaxes")?.value
+  );
+
+  console.log(
+    "universalCharges input:",
+    document.getElementById("universalCharges")?.value
+  );
+
+  console.log(
+    "fitAll input:",
+    document.getElementById("fitAll")?.value
+  );
+
+  console.log(
+    "geaAll input:",
+    document.getElementById("geaAll")?.value
+  );
+
+  console.log(
+    "lifeline input:",
+    document.getElementById("lifeline")?.value
+  );
+
+  console.log(
+    "otherCharges input:",
+    document.getElementById("otherCharges")?.value
+  );
+
+  console.log(
+    "FINAL DATA SENT:",
     data
+  );
+
+  console.log(
+    "================================="
   );
 
 
