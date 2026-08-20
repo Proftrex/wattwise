@@ -144,9 +144,12 @@
 
         <button
           type="button"
+          id="createAccountButton"
           class="create-account-link"
-          onclick="document.getElementById('registerModal').classList.remove('hidden')">
+          onclick="openRegister()">
+
           Create one here.
+
         </button>
 
       </div>
@@ -167,149 +170,6 @@
     <section
       id="dashboardSection"
       class="hidden">
-
-
-  <!-- =================================================
-       REGISTER MODAL
-       ================================================= -->
-
-  <div
-    id="registerModal"
-    class="modal hidden">
-
-    <div
-      class="modal-overlay"
-      onclick="closeRegister()">
-    </div>
-
-    <div class="modal-content small-modal">
-
-      <div class="modal-header">
-
-        <div>
-
-          <h2>
-            Create your WattWise account
-          </h2>
-
-          <p>
-            Set up your household electricity tracker.
-          </p>
-
-        </div>
-
-        <button
-          type="button"
-          class="close-button"
-          onclick="closeRegister()">
-
-          ×
-
-        </button>
-
-      </div>
-
-
-      <form
-        onsubmit="submitRegister(event)">
-
-        <div class="form-group">
-
-          <label>
-            Your name
-          </label>
-
-          <input
-            id="registerName"
-            type="text"
-            placeholder="Enter your name"
-            required>
-
-        </div>
-
-
-        <div class="form-group">
-
-          <label>
-            Email
-          </label>
-
-          <input
-            id="registerEmail"
-            type="email"
-            placeholder="example@email.com"
-            required>
-
-        </div>
-
-
-        <div class="form-group">
-
-          <label>
-            Password
-          </label>
-
-          <div class="password-wrapper">
-
-            <input
-              id="registerPassword"
-              type="password"
-              placeholder="Create a password"
-              required>
-
-          </div>
-
-        </div>
-
-
-        <div class="form-group">
-
-          <label>
-            Household name
-          </label>
-
-          <input
-            id="registerHousehold"
-            type="text"
-            placeholder="e.g. My Home"
-            required>
-
-        </div>
-
-
-        <div
-          id="registerMessage"
-          class="form-message">
-        </div>
-
-
-        <div class="modal-actions">
-
-          <button
-            type="button"
-            class="secondary-button"
-            onclick="closeRegister()">
-
-            Cancel
-
-          </button>
-
-
-          <button
-            type="submit"
-            class="primary-button">
-
-            Create Account
-
-          </button>
-
-        </div>
-
-      </form>
-
-    </div>
-
-  </div>
 
 
   <!-- =================================================
@@ -1690,7 +1550,7 @@
       <div class="form-group">
 
         <label>
-          Notes
+          Notes <span class="optional-label">(Optional)</span>
         </label>
 
         <textarea
@@ -1767,92 +1627,122 @@ RESET PASSWORD MODAL
   </div>
 
 
-  <div class="modal-content small-modal">
+  <div class="modal-content small-modal reset-password-modal">
 
-    <div class="modal-header">
+    <!-- RESET HEADER -->
 
-      <h3>
-        Reset Password
-      </h3>
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label>
-        Email
-      </label>
-
-      <input
-        id="resetEmail"
-        type="email"
-        placeholder="Enter your email">
-
-    </div>
-
-
-    <button
-      class="secondary-button"
-      onclick="sendResetCode()">
-
-      Send Reset Code
-
-    </button>
-
-
-    <div class="form-group">
-
-      <label>
-        Reset Code
-      </label>
-
-      <input
-        id="resetCode"
-        type="text"
-        placeholder="Enter reset code">
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label>
-        New Password
-      </label>
-
-      <input
-        id="resetNewPassword"
-        type="password"
-        placeholder="Enter new password">
-
-    </div>
-
-
-    <div
-      id="resetPasswordMessage"
-      class="login-error">
-    </div>
-
-
-    <div class="modal-actions">
+    <div class="reset-password-header">
 
       <button
-        class="secondary-button"
+        type="button"
+        class="close-button"
         onclick="closeResetPassword()">
-
-        Cancel
-
+        ×
       </button>
+
+      <img
+        src="assets/wattlogo.png"
+        class="reset-password-logo"
+        alt="WattWise">
+
+      <h2>
+        Reset Password
+      </h2>
+
+      <p>
+        Make sure you input the correct reset code.
+      </p>
+
+    </div>
+
+
+    <!-- RESET FORM -->
+
+    <div class="reset-password-body">
+
+      <div class="form-group">
+
+        <label>
+          Email
+        </label>
+
+        <input
+          id="resetEmail"
+          type="email"
+          placeholder="Enter your email">
+
+      </div>
 
 
       <button
-        class="primary-button"
-        onclick="submitResetPassword()">
+        id="sendResetCodeButton"
+        type="button"
+        class="secondary-button reset-code-button"
+        onclick="sendResetCode()">
 
-        Reset Password
+        Send Reset Code
 
       </button>
+
+
+
+      <div class="form-group">
+
+        <label>
+          Reset Code
+        </label>
+
+        <input
+          id="resetCode"
+          type="text"
+          placeholder="Enter reset code">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          New Password
+        </label>
+
+        <input
+          id="resetNewPassword"
+          type="password"
+          placeholder="Enter new password">
+
+      </div>
+
+
+      <div
+        id="resetPasswordMessage"
+        class="login-error">
+      </div>
+
+
+      <div class="modal-actions reset-password-actions">
+
+        <button
+          type="button"
+          class="secondary-button"
+          onclick="closeResetPassword()">
+
+          Cancel
+
+        </button>
+
+
+        <button
+          id="resetPasswordButton"
+          type="button"
+          class="primary-button"
+          onclick="submitResetPassword()">
+
+          Reset Password
+
+        </button>
+
+      </div>
 
     </div>
 
@@ -1968,196 +1858,223 @@ RESET PASSWORD MODAL
 
 
 
-      <div class="form-group">
+      <!-- ACTUAL CONSUMPTION -->
 
-        <label>
-          Actual kWh
-        </label>
-
-        <div id="billViewKwh">
-          —
-        </div>
-
+      <div class="bill-section-label">
+        Actual Consumption:
       </div>
 
-<h3>
-  Electricity Charges
-</h3>
+      <div
+        id="billViewKwh"
+        class="bill-consumption-value">
+        —
+      </div>
 
 
-<div onclick="event.stopPropagation();">
-  Generation:
-  <span id="billViewGeneration">₱0</span>
+      <!-- GENERATION -->
 
-  <input
-  id="editGeneration"
-  type="number"
-  step="0.01"
-  style="display:none;"
->
-</div>
+      <div class="bill-charge-row">
+        <span>
+          Generation:
+        </span>
 
+        <span id="billViewGeneration">
+          ₱0.00
+        </span>
 
-<div onclick="event.stopPropagation();">
-  Transmission:
-  <span id="billViewTransmission">₱0</span>
-
-  <input
-    id="editTransmission"
-    type="number"
-    step="0.01"
-    style="display:none;"
-    onclick="event.stopPropagation();"
-    onmousedown="event.stopPropagation();"
-    onfocus="event.stopPropagation();"
-    oninput="event.stopPropagation();">
-</div>
+        <input
+          id="editGeneration"
+          type="number"
+          step="0.01"
+          style="display:none;"
+          onclick="event.stopPropagation();"
+          onmousedown="event.stopPropagation();"
+          onfocus="event.stopPropagation();"
+          oninput="event.stopPropagation();">
+      </div>
 
 
-<div onclick="event.stopPropagation();">
-  System Loss:
-  <span id="billViewSystemLoss">₱0</span>
+      <!-- ADDITIONAL CHARGES -->
 
-  <input
-    id="editSystemLoss"
-    type="number"
-    step="0.01"
-    style="display:none;"
-    onclick="event.stopPropagation();"
-    onmousedown="event.stopPropagation();"
-    onfocus="event.stopPropagation();"
-    oninput="event.stopPropagation();">
-</div>
+      <div class="bill-section-label additional-charges-label">
+        Additional Charges:
+      </div>
 
 
-<div onclick="event.stopPropagation();">
-  Distribution:
-  <span id="billViewDistribution">₱0</span>
+      <div class="bill-charge-row">
+        <span>Transmission:</span>
+        <span id="billViewTransmission">₱0.00</span>
 
-  <input
-    id="editDistribution"
-    type="number"
-    step="0.01"
-    style="display:none;"
-    onclick="event.stopPropagation();"
-    onmousedown="event.stopPropagation();"
-    onfocus="event.stopPropagation();"
-    oninput="event.stopPropagation();">
-</div>
-
-
-<div onclick="event.stopPropagation();">
-  Senior Citizen:
-  <span id="billViewSeniorCitizen">₱0</span>
-
-  <input
-    id="editSeniorCitizen"
-    type="number"
-    step="0.01"
-    style="display:none;"
-    onclick="event.stopPropagation();"
-    onmousedown="event.stopPropagation();"
-    onfocus="event.stopPropagation();"
-    oninput="event.stopPropagation();">
-</div>
+        <input
+          id="editTransmission"
+          type="number"
+          step="0.01"
+          style="display:none;"
+          onclick="event.stopPropagation();"
+          onmousedown="event.stopPropagation();"
+          onfocus="event.stopPropagation();"
+          oninput="event.stopPropagation();">
+      </div>
 
 
-<div onclick="event.stopPropagation();">
-  Government Taxes:
-  <span id="billViewGovernmentTaxes">₱0</span>
+      <div class="bill-charge-row">
+        <span>System Loss:</span>
+        <span id="billViewSystemLoss">₱0.00</span>
 
-  <input
-    id="editGovernmentTaxes"
-    type="number"
-    step="0.01"
-    style="display:none;"
-    onclick="event.stopPropagation();"
-    onmousedown="event.stopPropagation();"
-    onfocus="event.stopPropagation();"
-    oninput="event.stopPropagation();">
-</div>
-
-
-<div onclick="event.stopPropagation();">
-  Universal Charges:
-  <span id="billViewUniversalCharges">₱0</span>
-
-  <input
-    id="editUniversalCharges"
-    type="number"
-    step="0.01"
-    style="display:none;"
-    onclick="event.stopPropagation();"
-    onmousedown="event.stopPropagation();"
-    onfocus="event.stopPropagation();"
-    oninput="event.stopPropagation();">
-</div>
+        <input
+          id="editSystemLoss"
+          type="number"
+          step="0.01"
+          style="display:none;"
+          onclick="event.stopPropagation();"
+          onmousedown="event.stopPropagation();"
+          onfocus="event.stopPropagation();"
+          oninput="event.stopPropagation();">
+      </div>
 
 
-<div onclick="event.stopPropagation();">
-  FIT-All:
-  <span id="billViewFitAll">₱0</span>
+      <div class="bill-charge-row">
+        <span>Distribution:</span>
+        <span id="billViewDistribution">₱0.00</span>
 
-  <input
-    id="editFitAll"
-    type="number"
-    step="0.01"
-    style="display:none;"
-    onclick="event.stopPropagation();"
-    onmousedown="event.stopPropagation();"
-    onfocus="event.stopPropagation();"
-    oninput="event.stopPropagation();">
-</div>
-
-
-<div onclick="event.stopPropagation();">
-  GEA-All:
-  <span id="billViewGeaAll">₱0</span>
-
-  <input
-    id="editGeaAll"
-    type="number"
-    step="0.01"
-    style="display:none;"
-    onclick="event.stopPropagation();"
-    onmousedown="event.stopPropagation();"
-    onfocus="event.stopPropagation();"
-    oninput="event.stopPropagation();">
-</div>
+        <input
+          id="editDistribution"
+          type="number"
+          step="0.01"
+          style="display:none;"
+          onclick="event.stopPropagation();"
+          onmousedown="event.stopPropagation();"
+          onfocus="event.stopPropagation();"
+          oninput="event.stopPropagation();">
+      </div>
 
 
-<div onclick="event.stopPropagation();">
-  Lifeline:
-  <span id="billViewLifeline">₱0</span>
+      <div class="bill-charge-row">
+        <span>Senior Citizen:</span>
+        <span id="billViewSeniorCitizen">₱0.00</span>
 
-  <input
-    id="editLifeline"
-    type="number"
-    step="0.01"
-    style="display:none;"
-    onclick="event.stopPropagation();"
-    onmousedown="event.stopPropagation();"
-    onfocus="event.stopPropagation();"
-    oninput="event.stopPropagation();">
-</div>
+        <input
+          id="editSeniorCitizen"
+          type="number"
+          step="0.01"
+          style="display:none;"
+          onclick="event.stopPropagation();"
+          onmousedown="event.stopPropagation();"
+          onfocus="event.stopPropagation();"
+          oninput="event.stopPropagation();">
+      </div>
 
 
-<div onclick="event.stopPropagation();">
-  Other Charges:
-  <span id="billViewOtherCharges">₱0</span>
+      <div class="bill-charge-row">
+        <span>Government Taxes:</span>
+        <span id="billViewGovernmentTaxes">₱0.00</span>
 
-  <input
-    id="editOtherCharges"
-    type="number"
-    step="0.01"
-    style="display:none;"
-    onclick="event.stopPropagation();"
-    onmousedown="event.stopPropagation();"
-    onfocus="event.stopPropagation();"
-    oninput="event.stopPropagation();">
-</div>
+        <input
+          id="editGovernmentTaxes"
+          type="number"
+          step="0.01"
+          style="display:none;"
+          onclick="event.stopPropagation();"
+          onmousedown="event.stopPropagation();"
+          onfocus="event.stopPropagation();"
+          oninput="event.stopPropagation();">
+      </div>
 
-      <br>
+
+      <div class="bill-charge-row">
+        <span>Universal Charges:</span>
+        <span id="billViewUniversalCharges">₱0.00</span>
+
+        <input
+          id="editUniversalCharges"
+          type="number"
+          step="0.01"
+          style="display:none;"
+          onclick="event.stopPropagation();"
+          onmousedown="event.stopPropagation();"
+          onfocus="event.stopPropagation();"
+          oninput="event.stopPropagation();">
+      </div>
+
+
+      <div class="bill-charge-row">
+        <span>FIT-All:</span>
+        <span id="billViewFitAll">₱0.00</span>
+
+        <input
+          id="editFitAll"
+          type="number"
+          step="0.01"
+          style="display:none;"
+          onclick="event.stopPropagation();"
+          onmousedown="event.stopPropagation();"
+          onfocus="event.stopPropagation();"
+          oninput="event.stopPropagation();">
+      </div>
+
+
+      <div class="bill-charge-row">
+        <span>GEA-All:</span>
+        <span id="billViewGeaAll">₱0.00</span>
+
+        <input
+          id="editGeaAll"
+          type="number"
+          step="0.01"
+          style="display:none;"
+          onclick="event.stopPropagation();"
+          onmousedown="event.stopPropagation();"
+          onfocus="event.stopPropagation();"
+          oninput="event.stopPropagation();">
+      </div>
+
+
+      <div class="bill-charge-row">
+        <span>Lifeline:</span>
+        <span id="billViewLifeline">₱0.00</span>
+
+        <input
+          id="editLifeline"
+          type="number"
+          step="0.01"
+          style="display:none;"
+          onclick="event.stopPropagation();"
+          onmousedown="event.stopPropagation();"
+          onfocus="event.stopPropagation();"
+          oninput="event.stopPropagation();">
+      </div>
+
+
+      <div class="bill-charge-row">
+        <span>Other Charges:</span>
+        <span id="billViewOtherCharges">₱0.00</span>
+
+        <input
+          id="editOtherCharges"
+          type="number"
+          step="0.01"
+          style="display:none;"
+          onclick="event.stopPropagation();"
+          onmousedown="event.stopPropagation();"
+          onfocus="event.stopPropagation();"
+          oninput="event.stopPropagation();">
+      </div>
+
+
+      <!-- TOTAL ADDITIONAL CHARGES -->
+
+      <div class="bill-total-additional">
+        <span>
+          Total Additional Charges
+        </span>
+
+        <span id="billViewTotalAdditionalCharges">
+          ₱0.00
+        </span>
+      </div>
+
+
+      <div class="bill-divider"></div>
 
 
       <div class="form-group">
@@ -2194,7 +2111,8 @@ RESET PASSWORD MODAL
   <button
   type="button"
   id="editBillButton"
-  class="edit-bill-button">
+  class="edit-bill-button"
+  onclick="enableBillEdit();">
   Edit Bill
 </button>
 
@@ -2222,6 +2140,152 @@ RESET PASSWORD MODAL
 </div>
 </div>
 </div>
+
+
+
+
+  <!-- =================================================
+       REGISTER MODAL
+       ================================================= -->
+
+  <div
+    id="registerModal"
+    class="modal hidden">
+
+    <div
+      class="modal-overlay"
+      onclick="closeRegister()">
+    </div>
+
+    <div class="modal-content small-modal">
+
+      <div class="modal-header">
+
+        <div>
+
+          <h2>
+            Create your WattWise account
+          </h2>
+
+          <p>
+            Set up your household electricity tracker.
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="close-button"
+          onclick="closeRegister()">
+
+          ×
+
+        </button>
+
+      </div>
+
+
+      <form
+        onsubmit="submitRegister(event)">
+
+        <div class="form-group">
+
+          <label>
+            Your name
+          </label>
+
+          <input
+            id="registerName"
+            type="text"
+            placeholder="Enter your name"
+            required>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Email
+          </label>
+
+          <input
+            id="registerEmail"
+            type="email"
+            placeholder="example@email.com"
+            required>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Password
+          </label>
+
+          <div class="password-wrapper">
+
+            <input
+              id="registerPassword"
+              type="password"
+              placeholder="Create a password"
+              required>
+
+          </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Household name
+          </label>
+
+          <input
+            id="registerHousehold"
+            type="text"
+            placeholder="e.g. My Home"
+            required>
+
+        </div>
+
+
+        <div
+          id="registerMessage"
+          class="form-message">
+        </div>
+
+
+        <div class="modal-actions">
+
+          <button
+            type="button"
+            class="secondary-button"
+            onclick="closeRegister()">
+
+            Cancel
+
+          </button>
+
+
+          <button
+            type="submit"
+            class="primary-button">
+
+            Create Account
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
 
 
 </body>
