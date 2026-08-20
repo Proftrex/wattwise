@@ -1016,3 +1016,44 @@ button,
 
 }
 
+
+
+/* ===============================
+   CREATE ACCOUNT LINK
+   =============================== */
+
+.create-account {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 14px;
+  color: #7a6656 !important;
+}
+
+.create-account span {
+  color: #6b9b63 !important;
+  text-decoration: underline !important;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  cursor: pointer !important;
+  font-weight: 700 !important;
+}
+
+.create-account span:hover {
+  color: #4d7c47 !important;
+}
+
+
+.create-account-link {
+  color: #4d7c47 !important;
+  text-decoration: underline !important;
+  cursor: pointer !important;
+  font-weight: 700 !important;
+  display: inline-block !important;
+  position: relative !important;
+  z-index: 9999 !important;
+}
+
+.create-account-link:hover {
+  color: #6b9b63 !important;
+}
+
