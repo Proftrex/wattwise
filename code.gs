@@ -59,6 +59,20 @@ function doGet(e) {
 
         break;
 
+      case "registerUser":
+
+        result =
+          registerUser(
+            e.parameter.email,
+            e.parameter.password,
+            e.parameter.name,
+            e.parameter.householdName
+          );
+
+        break;
+
+
+
 
       case "getUserSpreadsheet":
 

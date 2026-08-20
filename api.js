@@ -73,6 +73,28 @@ async function getUserIdByLogin(email, password) {
 }
 
 
+// REGISTRATION
+
+async function registerUser(
+  email,
+  password,
+  name,
+  householdName
+) {
+
+  return await apiCall(
+    "registerUser",
+    {
+      email: email,
+      password: password,
+      name: name,
+      householdName: householdName
+    }
+  );
+
+}
+
+
 // DASHBOARD
 
 async function getDashboard(userId, month) {
@@ -192,6 +214,43 @@ async function updateSavedBill(userId, billId, data) {
       userId: userId,
       billId: billId,
       data: JSON.stringify(data)
+    }
+  );
+
+}
+
+
+
+// =========================
+// PASSWORD RESET
+// =========================
+
+
+async function requestPasswordReset(email) {
+
+  return await apiCall(
+    "requestPasswordReset",
+    {
+      email: email
+    }
+  );
+
+}
+
+
+
+async function resetPassword(
+  email,
+  code,
+  newPassword
+) {
+
+  return await apiCall(
+    "resetPassword",
+    {
+      email: email,
+      code: code,
+      newPassword: newPassword
     }
   );
 

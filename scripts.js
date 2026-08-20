@@ -311,7 +311,7 @@ function startTracker() {
               result &&
               result.message
                 ? result.message
-                : "Email and Password do not match. Please make sure you have the correct login details.";
+                : "Invalid email or password.";
 
 
             errorBox.classList.add(
@@ -5044,4 +5044,626 @@ console.log(
 
 }
 
+
+
+
+/*******************************************************
+ * PASSWORD RESET UI
+ *******************************************************/
+
+
+function openResetPassword() {
+
+  const modal =
+    document.getElementById(
+      "resetPasswordModal"
+    );
+
+  if (modal) {
+
+    modal.classList.remove(
+      "hidden"
+    );
+
+  }
+
+
+  const email =
+    document.getElementById(
+      "userEmail"
+    );
+
+
+  const resetEmail =
+    document.getElementById(
+      "resetEmail"
+    );
+
+
+  if (
+    email &&
+    resetEmail
+  ) {
+
+    resetEmail.value =
+      email.value;
+
+  }
+
+}
+
+
+
+function closeResetPassword() {
+
+  const modal =
+    document.getElementById(
+      "resetPasswordModal"
+    );
+
+  if (modal) {
+
+    modal.classList.add(
+      "hidden"
+    );
+
+  }
+
+}
+
+
+
+async function submitResetPassword() {
+
+
+  const email =
+    document.getElementById(
+      "resetEmail"
+    )
+    .value
+    .trim()
+    .toLowerCase();
+
+
+  const code =
+    document.getElementById(
+      "resetCode"
+    )
+    .value
+    .trim();
+
+
+  const newPassword =
+    document.getElementById(
+      "resetNewPassword"
+    )
+    .value
+    .trim();
+
+
+  const message =
+    document.getElementById(
+      "resetPasswordMessage"
+    );
+
+
+  if (!email || !code || !newPassword) {
+
+    message.innerText =
+      "Please complete all fields.";
+
+    message.classList.add(
+      "show"
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+
+    const result =
+      await apiCall(
+        "resetPassword",
+        {
+          email: email,
+          code: code,
+          newPassword: newPassword
+        }
+      );
+
+
+    if (
+      result &&
+      result.success
+    ) {
+
+      message.innerText =
+        "Password updated successfully.";
+
+      message.classList.add(
+        "show"
+      );
+
+
+      setTimeout(
+        function(){
+
+          closeResetPassword();
+
+        },
+        2000
+      );
+
+
+    } else {
+
+
+      message.innerText =
+        result.message ||
+        "Unable to reset password.";
+
+
+      message.classList.add(
+        "show"
+      );
+
+    }
+
+
+  } catch(error) {
+
+
+    message.innerText =
+      error.message;
+
+
+    message.classList.add(
+      "show"
+    );
+
+
+  }
+
+
+}
+
+
+
+
+
+/*******************************************************
+ * SEND PASSWORD RESET CODE
+ *******************************************************/
+
+
+async function sendResetCode() {
+
+
+  const email =
+    document.getElementById(
+      "resetEmail"
+    )
+    .value
+    .trim()
+    .toLowerCase();
+
+
+  const message =
+    document.getElementById(
+      "resetPasswordMessage"
+    );
+
+
+  if (!email) {
+
+    message.innerText =
+      "Please enter your email.";
+
+    message.classList.add(
+      "show"
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+
+    const result =
+      await apiCall(
+        "requestPasswordReset",
+        {
+          email: email
+        }
+      );
+
+
+    if (
+      result &&
+      result.success
+    ) {
+
+      message.innerText =
+        "Reset code generated. Check your reset code.";
+
+      message.classList.add(
+        "show"
+      );
+
+
+      console.log(
+        "RESET CODE:",
+        result.code
+      );
+
+
+    } else {
+
+      message.innerText =
+        result.message ||
+        "Unable to generate reset code.";
+
+      message.classList.add(
+        "show"
+      );
+
+    }
+
+
+  } catch(error) {
+
+
+    message.innerText =
+      error.message;
+
+
+    message.classList.add(
+      "show"
+    );
+
+
+  }
+
+
+}
+
+
+
+
+/*******************************************************
+ * PASSWORD VISIBILITY TOGGLE
+ *******************************************************/
+
+function togglePasswordVisibility() {
+
+  const password =
+    document.getElementById(
+      "userPassword"
+    );
+
+
+  const icon =
+    document.getElementById(
+      "passwordToggleIcon"
+    );
+
+
+  if (!password || !icon) {
+    return;
+  }
+
+
+  if (password.type === "password") {
+
+    password.type = "text";
+
+    icon.src =
+      "assets/Open.png";
+
+
+  } else {
+
+    password.type = "password";
+
+    icon.src =
+      "assets/Close.png";
+
+  }
+
+}
+
+
+
+
+/* =====================================================
+   REGISTRATION
+   ===================================================== */
+
+function openRegister() {
+
+  const modal =
+    document.getElementById(
+      'registerModal'
+    );
+
+  if (!modal) {
+    console.error(
+      'registerModal not found.'
+    );
+    return;
+  }
+
+  modal.classList.remove(
+    'hidden'
+  );
+
+}
+
+
+function closeRegister() {
+
+  const modal =
+    document.getElementById(
+      'registerModal'
+    );
+
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.add(
+    'hidden'
+  );
+
+}
+
+
+function submitRegister(event) {
+
+  if (event) {
+    event.preventDefault();
+  }
+
+
+  const name =
+    document
+      .getElementById(
+        'registerName'
+      )
+      .value
+      .trim();
+
+
+  const email =
+    document
+      .getElementById(
+        'registerEmail'
+      )
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const password =
+    document
+      .getElementById(
+        'registerPassword'
+      )
+      .value;
+
+
+  const householdName =
+    document
+      .getElementById(
+        'registerHousehold'
+      )
+      .value
+      .trim();
+
+
+  const message =
+    document.getElementById(
+      'registerMessage'
+    );
+
+
+  if (
+    !name ||
+    !email ||
+    !password ||
+    !householdName
+  ) {
+
+    if (message) {
+      message.textContent =
+        'All fields are required.';
+    }
+
+    return;
+  }
+
+
+  if (!isValidEmail(email)) {
+
+    if (message) {
+      message.textContent =
+        'Please enter a valid email address.';
+    }
+
+    return;
+  }
+
+
+  if (message) {
+    message.textContent =
+      'Creating your WattWise account...';
+  }
+
+
+  const buttons =
+    document.querySelectorAll(
+      '#registerModal button'
+    );
+
+
+  buttons.forEach(
+    function(button) {
+      button.disabled = true;
+    }
+  );
+
+
+  registerUser(
+    email,
+    password,
+    name,
+    householdName
+  )
+
+    .then(
+      function(result) {
+
+        console.log(
+          'Registration result:',
+          result
+        );
+
+
+        if (
+          !result ||
+          !result.success
+        ) {
+
+          if (message) {
+            message.textContent =
+              result &&
+              result.message
+                ? result.message
+                : 'Unable to create account.';
+          }
+
+
+          buttons.forEach(
+            function(button) {
+              button.disabled = false;
+            }
+          );
+
+          return;
+        }
+
+
+        if (message) {
+          message.textContent =
+            'Account created successfully! You can now log in.';
+        }
+
+
+        /*
+         * Put the newly registered email
+         * into the login form.
+         */
+
+        const loginEmail =
+          document.getElementById(
+            'userEmail'
+          );
+
+
+        if (loginEmail) {
+          loginEmail.value =
+            email;
+        }
+
+
+        /*
+         * Clear the registration form.
+         */
+
+        document
+          .getElementById(
+            'registerName'
+          )
+          .value = '';
+
+
+        document
+          .getElementById(
+            'registerEmail'
+          )
+          .value = '';
+
+
+        document
+          .getElementById(
+            'registerPassword'
+          )
+          .value = '';
+
+
+        document
+          .getElementById(
+            'registerHousehold'
+          )
+          .value = '';
+
+
+        /*
+         * Close registration modal
+         * after a short delay.
+         */
+
+        setTimeout(
+          function() {
+
+            closeRegister();
+
+            if (message) {
+              message.textContent = '';
+            }
+
+
+            buttons.forEach(
+              function(button) {
+                button.disabled = false;
+              }
+            );
+
+          },
+          1200
+        );
+
+      }
+    )
+
+    .catch(
+      function(error) {
+
+        console.error(
+          'Registration failed:',
+          error
+        );
+
+
+        if (message) {
+          message.textContent =
+            getErrorMessage(error);
+        }
+
+
+        buttons.forEach(
+          function(button) {
+            button.disabled = false;
+          }
+        );
+
+      }
+    );
+
+}
 
