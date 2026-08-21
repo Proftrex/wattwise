@@ -1345,9 +1345,6 @@ textarea {
   z-index:
     1000;
 
-  display:
-    flex;
-
   align-items:
     center;
 
@@ -1356,6 +1353,15 @@ textarea {
 
   padding:
     20px;
+
+}
+
+
+
+.modal:not(.hidden) {
+
+  display:
+    flex;
 
 }
 
@@ -3285,19 +3291,21 @@ form {
    ===================================================== */
 
 #registerModal {
-  position: fixed !important;
-  inset: 0 !important;
+  position: fixed;
+  inset: 0;
 
-  display: flex !important;
+  align-items: center;
+  justify-content: center;
 
-  align-items: center !important;
-  justify-content: center !important;
+  padding: 24px;
 
-  padding: 24px !important;
+  background: rgba(246, 248, 245, 0.88);
 
-  background: rgba(246, 248, 245, 0.88) !important;
+  z-index: 999999;
+}
 
-  z-index: 999999 !important;
+#registerModal:not(.hidden) {
+  display: flex;
 }
 
 

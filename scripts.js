@@ -6072,6 +6072,7 @@ function togglePasswordVisibility() {
 
 function openRegister() {
 
+
   const modal =
     document.getElementById(
       'registerModal'
