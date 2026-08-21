@@ -171,11 +171,14 @@ current.data.totalCost;
   // ===============================
   // APPLIANCE RANKING
   // ===============================
+  // Reuse "current" (already calculated above)
+  // instead of recalculating all appliances again.
 
   const ranking =
     rankAppliances(
       userId,
-      month
+      month,
+      current
     );
 
 
@@ -192,7 +195,8 @@ current.data.totalCost;
   const categories =
     getCategoryBreakdown(
       userId,
-      month
+      month,
+      current
     );
 
 
@@ -205,11 +209,13 @@ current.data.totalCost;
   // ===============================
   // ALERTS
   // ===============================
+  // Reuse the ranking already computed above.
 
   const alerts =
     getHighConsumptionAppliances(
       userId,
-      month
+      month,
+      ranking
     );
 
 

@@ -1133,12 +1133,19 @@ return successResponse({
  */
 function rankAppliances(
   userId,
-  month
+  month,
+  precalculatedResult
 ) {
 
   try {
 
+    /*
+     * Reuse an already-computed calculation pass
+     * (e.g. from getDashboard) instead of hitting
+     * the spreadsheet and recalculating again.
+     */
     const result =
+      precalculatedResult ||
       calculateAllAppliances(
         userId,
         month
@@ -1194,12 +1201,19 @@ function rankAppliances(
  */
 function getCategoryBreakdown(
   userId,
-  month
+  month,
+  precalculatedResult
 ) {
 
   try {
 
+    /*
+     * Reuse an already-computed calculation pass
+     * (e.g. from getDashboard) instead of hitting
+     * the spreadsheet and recalculating again.
+     */
     const result =
+      precalculatedResult ||
       calculateAllAppliances(
         userId,
         month
@@ -1801,12 +1815,19 @@ function getApplianceAlertStatus(
  */
 function getHighConsumptionAppliances(
   userId,
-  month
+  month,
+  precalculatedRanking
 ) {
 
   try {
 
+    /*
+     * Reuse an already-computed ranking
+     * (e.g. from getDashboard) instead of
+     * recalculating all appliances again.
+     */
     const result =
+      precalculatedRanking ||
       rankAppliances(
         userId,
         month

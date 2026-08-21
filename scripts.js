@@ -613,9 +613,38 @@ function refreshDashboard() {
       APP.dashboard = result.data;
 
       /*
-       * Render immediately.
+       * Render dashboard.
        */
       renderDashboard(result.data);
+
+
+      /*
+       * Re-render appliance table after
+       * applianceRanking is available.
+       */
+      if (
+        APP.appliances &&
+        APP.appliances.length
+      ) {
+
+        renderApplianceTable(
+          APP.appliances
+        );
+
+      }
+
+      /*
+       * Appliance table may have already rendered
+       * before dashboard data arrived, so refresh
+       * it now that appliance ranking figures exist.
+       */
+      if (APP.appliances) {
+
+        renderApplianceTable(
+          APP.appliances
+        );
+
+      }
 
     })
 
@@ -1446,6 +1475,24 @@ function loadAppliances() {
           result.data || [];
 
 
+        if (
+          !APP.dashboard ||
+          !APP.dashboard.applianceRanking
+        ) {
+
+          setTimeout(function() {
+
+            renderApplianceTable(
+              APP.appliances
+            );
+
+          }, 500);
+
+          return;
+
+        }
+
+
         renderApplianceTable(
           APP.appliances
         );
@@ -1513,7 +1560,6 @@ function renderApplianceTable(
       ? APP.dashboard.applianceRanking
       : [];
 
-
   appliances.forEach(
     function(appliance) {
 
@@ -1522,8 +1568,13 @@ function renderApplianceTable(
           function(item) {
 
             return (
-              item.applianceId ===
-              appliance['Appliance ID']
+              String(item.applianceId || item.id || '')
+                .trim()
+                .toLowerCase()
+              ===
+              String(appliance['Appliance ID'] || '')
+                .trim()
+                .toLowerCase()
             );
 
           }
@@ -1643,7 +1694,7 @@ function renderApplianceTable(
               )}'
             )">
 
-            ✏️
+            <img src="assets/pencil.png" class="appliance-action-icon" alt="Edit">
 
           </button>
 
@@ -1651,13 +1702,13 @@ function renderApplianceTable(
           <button
             class="action-button delete-action"
             title="Delete"
-            onclick="deleteAppliance(
+            onclick="deleteApplianceUI(
               '${escapeAttribute(
                 appliance['Appliance ID']
               )}'
             )">
 
-            🗑️
+            <img src="assets/trash.png" class="appliance-action-icon" alt="Delete">
 
           </button>
 
@@ -2264,20 +2315,53 @@ console.log('APP.userId = ' + APP.userId);
           closeApplianceModal();
 
 
-          showLoading(
+          showToast(
             data.applianceId
               ? 'Appliance updated successfully'
               : 'Appliance saved successfully'
           );
 
 
-          setTimeout(function() {
+          /*
+           * Update the table instantly from the
+           * saved record instead of waiting on a
+           * round trip fetch + fixed delays.
+           */
+          const savedAppliance =
+            result.data;
 
-            hideLoading();
+          if (!APP.appliances) {
+            APP.appliances = [];
+          }
 
-            refreshDashboard();
+          const existingIndex =
+            APP.appliances.findIndex(
+              function(item) {
 
-          }, 1500);
+                return (
+                  String(item['Appliance ID'] || '') ===
+                  String(savedAppliance['Appliance ID'] || '')
+                );
+
+              }
+            );
+
+          if (existingIndex === -1) {
+            APP.appliances.push(savedAppliance);
+          } else {
+            APP.appliances[existingIndex] = savedAppliance;
+          }
+
+          renderApplianceTable(
+            APP.appliances
+          );
+
+          /*
+           * Refresh dashboard figures in the background;
+           * refreshDashboard() re-renders the table again
+           * once the appliance ranking data arrives.
+           */
+          refreshDashboard();
 
       })
 
@@ -2302,7 +2386,7 @@ console.log('APP.userId = ' + APP.userId);
    DELETE APPLIANCE
    ===================================================== */
 
-function deleteAppliance(
+function deleteApplianceUI(
   applianceId
 ) {
 
@@ -2323,19 +2407,6 @@ function deleteAppliance(
     appliance
       ? appliance['Appliance Name']
       : 'this appliance';
-
-
-  const confirmed =
-    confirm(
-      'Are you sure you want to delete ' +
-      name +
-      '?'
-    );
-
-
-  if (!confirmed) {
-    return;
-  }
 
 
   showLoading(
@@ -2374,6 +2445,21 @@ function deleteAppliance(
           'Appliance deleted successfully.'
         );
 
+        APP.appliances =
+          APP.appliances.filter(
+            function(item) {
+
+              return (
+                item['Appliance ID'] !==
+                applianceId
+              );
+
+            }
+          );
+
+        renderApplianceTable(
+          APP.appliances
+        );
 
         refreshDashboard();
 
@@ -2797,18 +2883,12 @@ function saveRate(
         closeRateModal();
 
 
-        showLoading(
+        showToast(
           'Electricity rate saved successfully'
         );
 
 
-        setTimeout(function() {
-
-          hideLoading();
-
-          refreshDashboard();
-
-        }, 1500);
+        refreshDashboard();
 
       })
 
@@ -3253,18 +3333,12 @@ function saveActualBill(event) {
       closeActualBillModal();
 
 
-      showLoading(
+      showToast(
         "Actual Bill saved successfully"
       );
 
 
-      setTimeout(function() {
-
-        hideLoading();
-
-        refreshDashboard();
-
-      }, 1500);
+      refreshDashboard();
 
     })
 
@@ -4346,8 +4420,17 @@ function displaySelectedBill() {
 
   if (notes) {
 
-    notes.textContent =
-      bill.notes || "";
+    if (bill.notes && bill.notes.trim()) {
+
+      notes.textContent = bill.notes;
+      notes.style.display = "block";
+
+    } else {
+
+      notes.textContent = "";
+      notes.style.display = "none";
+
+    }
 
   }
 
@@ -6350,19 +6433,15 @@ function deleteCurrentBill(){
       );
 
 
-    setTimeout(function(){
+    populateBillMonths();
 
-      populateBillMonths();
+    if(loadingOverlay){
 
-      if(loadingOverlay){
+      loadingOverlay.classList.add(
+        "hidden"
+      );
 
-        loadingOverlay.classList.add(
-          "hidden"
-        );
-
-      }
-
-    }, 1500);
+    }
 
 
   })
