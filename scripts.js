@@ -2931,9 +2931,36 @@ function saveRate(
         closeRateModal();
 
 
-        showToast(
-          'Electricity rate saved successfully'
-        );
+        const loadingText =
+          document.getElementById(
+            'loadingText'
+          );
+
+        const loadingOverlay =
+          document.getElementById(
+            'loadingOverlay'
+          );
+
+        if (loadingText) {
+          loadingText.textContent =
+            'Electricity rate saved successfully';
+        }
+
+        if (loadingOverlay) {
+          loadingOverlay.classList.remove(
+            'hidden'
+          );
+        }
+
+        setTimeout(function(){
+
+          if (loadingOverlay) {
+            loadingOverlay.classList.add(
+              'hidden'
+            );
+          }
+
+        }, 1500);
 
 
         refreshDashboard();
