@@ -1603,32 +1603,39 @@ form {
 
 .toast {
 
-  position:
-    fixed;
+  position: fixed;
 
-  bottom:
-    25px;
+  top: 50%;
 
-  right:
-    25px;
+  left: 50%;
 
-  z-index:
-    3000;
+  transform:
+    translate(-50%, -50%) scale(0.95);
+
+  z-index: 3000;
+
+  width: 320px;
 
   background:
-    #1d261d;
+    var(--green-light);
 
   color:
-    white;
+    #5a4030;
 
   padding:
-    12px 18px;
+    35px 30px;
 
   border-radius:
-    8px;
+    20px;
 
   font-size:
-    13px;
+    18px;
+
+  font-weight:
+    600;
+
+  text-align:
+    center;
 
   opacity:
     0;
@@ -1636,8 +1643,8 @@ form {
   pointer-events:
     none;
 
-  transform:
-    translateY(10px);
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.12);
 
   transition:
     all 0.25s ease;
@@ -1651,7 +1658,7 @@ form {
     1;
 
   transform:
-    translateY(0);
+    translate(-50%, -50%) scale(1);
 
 }
 

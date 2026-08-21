@@ -2315,11 +2315,30 @@ console.log('APP.userId = ' + APP.userId);
           closeApplianceModal();
 
 
-          showToast(
-            data.applianceId
-              ? 'Appliance updated successfully'
-              : 'Appliance saved successfully'
-          );
+          const loadingText =
+            document.getElementById("loadingText");
+
+          const loadingOverlay =
+            document.getElementById("loadingOverlay");
+
+          if (loadingText) {
+            loadingText.textContent =
+              data.applianceId
+                ? "Appliance updated successfully"
+                : "Appliance saved successfully";
+          }
+
+          if (loadingOverlay) {
+            loadingOverlay.classList.remove("hidden");
+          }
+
+          setTimeout(function(){
+
+            if (loadingOverlay) {
+              loadingOverlay.classList.add("hidden");
+            }
+
+          }, 1500);
 
 
           /*
@@ -2446,9 +2465,28 @@ function deleteApplianceUI(
         }
 
 
-        showToast(
-          'Appliance deleted successfully.'
-        );
+        const loadingText =
+          document.getElementById("loadingText");
+
+        const loadingOverlay =
+          document.getElementById("loadingOverlay");
+
+        if (loadingText) {
+          loadingText.textContent =
+            "Appliance deleted successfully.";
+        }
+
+        if (loadingOverlay) {
+          loadingOverlay.classList.remove("hidden");
+        }
+
+        setTimeout(function(){
+
+          if (loadingOverlay) {
+            loadingOverlay.classList.add("hidden");
+          }
+
+        }, 1500);
 
         APP.appliances =
           APP.appliances.filter(
