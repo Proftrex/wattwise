@@ -4057,7 +4057,9 @@ function populateBillMonths(){
 
 
       option.textContent =
-        bill.month;
+        formatBillMonthLabel(
+          bill.month
+        );
 
 
       dropdown.appendChild(
@@ -4075,8 +4077,127 @@ if(!dropdown.value && dropdown.options.length > 0){
 
 }
 
+
+function formatBillMonthLabel(monthValue){
+
+  const text =
+    String(
+      monthValue || ""
+    ).trim();
+
+  if(!text){
+    return "—";
+  }
+
+  const yyyyMmMatch =
+    text.match(
+      /^(\d{4})-(\d{2})$/
+    );
+
+  if(yyyyMmMatch){
+
+    const parsed =
+      new Date(
+        Number(yyyyMmMatch[1]),
+        Number(yyyyMmMatch[2]) - 1,
+        1
+      );
+
+    return parsed.toLocaleDateString(
+      "en-US",
+      {
+        month: "long",
+        year: "numeric"
+      }
+    );
+
+  }
+
+  const parsedDate =
+    new Date(text);
+
+  if(!isNaN(parsedDate.getTime())){
+
+    return parsedDate.toLocaleDateString(
+      "en-US",
+      {
+        month: "long",
+        year: "numeric"
+      }
+    );
+
+  }
+
+  return text;
+
+}
+
 displaySelectedBill();
 
+
+}
+
+
+function formatBillMonthLabel(monthValue){
+
+  const text =
+    String(
+      monthValue || ""
+    ).trim();
+
+  if(!text){
+    return "—";
+  }
+
+  const yyyyMmMatch =
+    text.match(
+      /^(\d{4})-(\d{2})$/
+    );
+
+  if(yyyyMmMatch){
+
+    const parsed =
+      new Date(
+        Number(yyyyMmMatch[1]),
+        Number(yyyyMmMatch[2]) - 1,
+        1
+      );
+
+    return parsed.toLocaleDateString(
+      "en-US",
+      {
+        month: "long",
+        year: "numeric"
+      }
+    );
+
+  }
+
+  const parsedDate =
+    new Date(text);
+
+  if(!isNaN(parsedDate.getTime())){
+
+    return parsedDate.toLocaleDateString(
+      "en-US",
+      {
+        month: "long",
+        year: "numeric"
+      }
+    );
+
+  }
+
+  return text;
+
+}
+
+
+function formatMonthBillLabel(monthValue){
+
+  return formatBillMonthLabel(
+    monthValue
+  );
 
 }
 
@@ -4159,7 +4280,9 @@ function displaySelectedBill() {
   if (month) {
 
     month.textContent =
-      bill.month || "—";
+      formatBillMonthLabel(
+        bill.month
+      );
 
   }
 

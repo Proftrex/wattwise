@@ -1200,6 +1200,16 @@ function saveActualBillDirect(data){
     }
 
 
+    normalizeBillHistorySheet_(sheet);
+    const billMonth =
+      String(
+        data.billMonth ||
+        data.month ||
+        ""
+      ).trim();
+
+
+
 
     const billId =
       "BILL-" +
@@ -1216,7 +1226,7 @@ function saveActualBillDirect(data){
       userId,
 
 
-      data.billMonth || "",
+      billMonth,
 
 
       Number(
@@ -1328,6 +1338,175 @@ function saveActualBillDirect(data){
 
     };
 
+
+  }
+
+}
+
+
+function normalizeBillHistorySheet_(sheet){
+
+  const expectedHeaders = [
+    "Bill ID",
+    "User ID",
+    "Bill Month",
+    "Actual kWh",
+    "Generation",
+    "Transmission",
+    "System Loss",
+    "Distribution",
+    "Senior Citizen",
+    "Government Taxes",
+    "Universal Charges",
+    "FIT-All",
+    "GEA-All",
+    "Lifeline",
+    "Other Charges",
+    "Actual Bill",
+    "Notes",
+    "Created At"
+  ];
+
+  const numericColumns = {
+    "Actual kWh": true,
+    "Generation": true,
+    "Transmission": true,
+    "System Loss": true,
+    "Distribution": true,
+    "Senior Citizen": true,
+    "Government Taxes": true,
+    "Universal Charges": true,
+    "FIT-All": true,
+    "GEA-All": true,
+    "Lifeline": true,
+    "Other Charges": true,
+    "Actual Bill": true
+  };
+
+  const lastRow =
+    sheet.getLastRow();
+
+  const lastColumn = Math.max(
+    sheet.getLastColumn(),
+    expectedHeaders.length
+  );
+
+  if(lastRow === 0){
+
+    sheet
+      .getRange(
+        1,
+        1,
+        1,
+        expectedHeaders.length
+      )
+      .setValues([
+        expectedHeaders
+      ]);
+
+    return;
+
+  }
+
+  const values =
+    sheet
+      .getRange(
+        1,
+        1,
+        lastRow,
+        lastColumn
+      )
+      .getValues();
+
+  const headers =
+    values[0]
+      .map(function(value){
+        return String(value || "").trim();
+      });
+
+  const isAlreadyNormalized =
+    expectedHeaders.every(
+      function(header, index){
+        return headers[index] === header;
+      }
+    );
+
+  if(isAlreadyNormalized){
+    return;
+  }
+
+  const headerIndex = {};
+
+  headers.forEach(function(header, index){
+    if(header){
+      headerIndex[header] = index;
+    }
+  });
+
+  const migratedRows =
+    values
+      .slice(1)
+      .filter(function(row){
+        return row.some(function(cell){
+          return String(cell || "").trim() !== "";
+        });
+      })
+      .map(function(row){
+
+        return expectedHeaders.map(function(header){
+
+          let sourceIndex =
+            headerIndex[header];
+
+          if(sourceIndex === undefined && header === "Bill Month"){
+            sourceIndex = headerIndex["Month"];
+          }
+
+          if(sourceIndex === undefined && header === "Created At"){
+            sourceIndex = headerIndex["Updated At"];
+          }
+
+          if(sourceIndex === undefined){
+            return numericColumns[header] ? 0 : "";
+          }
+
+          const value = row[sourceIndex];
+
+          if(numericColumns[header]){
+            return Number(value || 0);
+          }
+
+          return value;
+
+        });
+
+      });
+
+  sheet.clearContents();
+
+  sheet
+    .getRange(
+      1,
+      1,
+      1,
+      expectedHeaders.length
+    )
+    .setValues([
+      expectedHeaders
+    ]);
+
+  if(migratedRows.length > 0){
+
+    sheet
+      .getRange(
+        2,
+        1,
+        migratedRows.length,
+        expectedHeaders.length
+      )
+      .setValues(
+        migratedRows
+      );
 
   }
 
