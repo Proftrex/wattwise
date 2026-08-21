@@ -2361,7 +2361,12 @@ console.log('APP.userId = ' + APP.userId);
            * refreshDashboard() re-renders the table again
            * once the appliance ranking data arrives.
            */
-          refreshDashboard();
+          setTimeout(
+            function() {
+              refreshDashboard();
+            },
+            500
+          );
 
       })
 
@@ -2461,7 +2466,12 @@ function deleteApplianceUI(
           APP.appliances
         );
 
-        refreshDashboard();
+        setTimeout(
+          function() {
+            refreshDashboard();
+          },
+          500
+        );
 
       })
 
