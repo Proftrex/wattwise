@@ -3408,9 +3408,30 @@ function saveActualBill(event) {
       closeActualBillModal();
 
 
-      showToast(
-        "Actual Bill saved successfully"
-      );
+      const loadingText =
+        document.getElementById(
+          'loadingText'
+        );
+
+      const loadingOverlay =
+        document.getElementById(
+          'loadingOverlay'
+        );
+
+      if (loadingText) {
+        loadingText.textContent =
+          "Actual Bill saved successfully";
+      }
+
+      setTimeout(function(){
+
+        if (loadingOverlay) {
+          loadingOverlay.classList.add(
+            'hidden'
+          );
+        }
+
+      }, 1500);
 
 
       refreshDashboard();
