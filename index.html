@@ -66,7 +66,7 @@
 
     <section
       id="setupSection"
-      class="setup-card">
+      class="setup-card hidden">
 
       <div class="setup-icon">
         <img src="assets/icons/House.png" class="login-logo" alt="WattWise">
@@ -337,21 +337,36 @@
     <div class="dashboard-top">
 
   <div class="dashboard-title">
+
+    <img src="assets/simplewattlogo.png" class="dashboard-logo">
+
     <p id="householdGreeting">
       WattWise Dashboard
     </p>
+
   </div>
 
-  <div class="month-selector">
+  <div class="dashboard-actions">
 
-    <label for="selectedMonth">
-      Month
-    </label>
+    <button
+      onclick="logout()"
+      class="logout-btn">
+      Logout
+    </button>
 
-    <select
-      id="selectedMonth"
-      onchange="refreshDashboard()">
-    </select>
+
+    <div class="month-selector">
+
+      <label for="selectedMonth">
+        Month
+      </label>
+
+      <select
+        id="selectedMonth"
+        onchange="refreshDashboard()">
+      </select>
+
+    </div>
 
   </div>
 
@@ -1796,7 +1811,7 @@ RESET PASSWORD MODAL
       </button>
 
       <img
-        src="assets/wattlogo.png"
+        src="assets/simplewattlogo.png"
         class="reset-password-logo"
         alt="WattWise">
 

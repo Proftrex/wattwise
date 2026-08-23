@@ -142,87 +142,61 @@ if (monthSelector) {
 
   /*
    * ==================================================
-   * RESTORE EMAIL / HOUSEHOLD ONLY
+   * RESTORE WATTWISE SESSION
    *
-   * DO NOT restore the User ID from localStorage.
-   *
-   * The real User ID must always come from
-   * getUserIdByEmail().
+   * Keep user logged in until logout.
    * ==================================================
    */
 
-  const savedEmail =
+  const savedSession =
     localStorage.getItem(
-      'electricityTrackerEmail'
+      "wattwiseSession"
     );
 
 
-  const savedHousehold =
-    localStorage.getItem(
-      'electricityTrackerHousehold'
-    );
+  if(savedSession){
+
+    const session =
+      JSON.parse(savedSession);
 
 
-  if (savedEmail) {
-
-    document
-      .getElementById(
-        'userEmail'
-      )
-      .value =
-      savedEmail;
-
-
-    document
-      .getElementById(
-        'householdName'
-      )
-      .value =
-      savedHousehold ||
-      'My Household';
-
-
-    const savedUserId =
-      localStorage.getItem(
-        'electricityTrackerUserId'
-      );
-
-
-    if(savedUserId){
-
-      APP.userId =
-        savedUserId;
-
-
-      APP.email =
-        savedEmail;
-
-
-      APP.householdName =
-        savedHousehold ||
-        'My Household';
-
-
-      showDashboard();
-
-      refreshDashboard();
-
-      loadAppliances();
-
-      return;
-
-    }
+    APP.userId =
+      session.userId;
 
 
     APP.email =
-      savedEmail;
+      session.email;
 
 
     APP.householdName =
-      savedHousehold ||
-      'My Household';
+      session.householdName ||
+      "My Household";
+
+
+    console.log(
+      "Restored WattWise session:",
+      APP.userId
+    );
+
+
+    continueLoadingApp();
+
+
+    return;
 
   }
+
+
+  // No saved session: show login screen
+
+  document
+    .getElementById(
+      "setupSection"
+    )
+    .classList
+    .remove(
+      "hidden"
+    );
 
 }
 
@@ -361,6 +335,16 @@ function startTracker() {
 
         APP.userId =
           result.userId;
+
+
+        localStorage.setItem(
+          "wattwiseSession",
+          JSON.stringify({
+            userId: APP.userId,
+            email: APP.email,
+            householdName: APP.householdName
+          })
+        );
 
 /*
  * ==================================================
@@ -3179,8 +3163,7 @@ function openBillModal(){
           );
 
 
-
-          loadActualBills();
+          continueLoadingApp();
 
 
 
@@ -6710,3 +6693,61 @@ function deleteCurrentBill(){
   });
 
 }
+
+
+/* =====================================================
+   LOGOUT
+   ===================================================== */
+
+function logout() {
+
+  console.log("Logging out WattWise user...");
+
+  localStorage.removeItem(
+    "wattwiseSession"
+  );
+
+  localStorage.removeItem(
+    "electricityTrackerUserId"
+  );
+
+  localStorage.removeItem(
+    "electricityTrackerEmail"
+  );
+
+  localStorage.removeItem(
+    "electricityTrackerHousehold"
+  );
+
+
+  APP.userId = "";
+  APP.email = "";
+  APP.householdName = "";
+
+
+  document
+    .getElementById(
+      "dashboardSection"
+    )
+    .classList
+    .add(
+      "hidden"
+    );
+
+
+  document
+    .getElementById(
+      "setupSection"
+    )
+    .classList
+    .remove(
+      "hidden"
+    );
+
+
+  showToast(
+    "Logged out successfully."
+  );
+
+}
+
