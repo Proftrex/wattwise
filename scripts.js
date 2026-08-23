@@ -182,16 +182,36 @@ if (monthSelector) {
       'My Household';
 
 
-    /*
-     * Clear any old/stale User ID.
-     */
-    localStorage.removeItem(
-      'electricityTrackerUserId'
-    );
+    const savedUserId =
+      localStorage.getItem(
+        'electricityTrackerUserId'
+      );
 
 
-    APP.userId =
-      '';
+    if(savedUserId){
+
+      APP.userId =
+        savedUserId;
+
+
+      APP.email =
+        savedEmail;
+
+
+      APP.householdName =
+        savedHousehold ||
+        'My Household';
+
+
+      showDashboard();
+
+      refreshDashboard();
+
+      loadAppliances();
+
+      return;
+
+    }
 
 
     APP.email =
