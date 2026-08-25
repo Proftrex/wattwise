@@ -8,6 +8,17 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1">
 
+        <link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#79d862">
+
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="WattWise">
+
+<link rel="apple-touch-icon" href="assets/pwa/icon-192.png">
+
   <title>
     Household Electricity Tracker
   </title>
@@ -15,6 +26,8 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="pouch-ui.css">
 
+
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 
 
@@ -312,7 +325,11 @@
 
 
 
-</body>
+
+
+
+
+
 
 
 
@@ -1778,7 +1795,7 @@
 </div>
 
 
-  
+
 
 
 
@@ -1947,7 +1964,7 @@ RESET PASSWORD MODAL
     id="toast"
     class="toast">
   </div>
-  
+
 <script src="api.js"></script>
 <script src="scripts.js"></script>
 
@@ -2266,9 +2283,9 @@ RESET PASSWORD MODAL
 
 
 
-    
 
-        
+
+
 
 
 <!-- BILL ACTION BUTTONS -->
@@ -2311,9 +2328,27 @@ RESET PASSWORD MODAL
 
 
 
-  </body>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker
+      .register("./service-worker.js")
+      .then(function (registration) {
+        console.log(
+          "WattWise service worker registered:",
+          registration.scope
+        );
+      })
+      .catch(function (error) {
+        console.error(
+          "WattWise service worker registration failed:",
+          error
+        );
+      });
+  });
+}
+</script>
+</body>
 
 </html>
-
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-
